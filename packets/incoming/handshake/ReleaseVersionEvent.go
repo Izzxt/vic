@@ -7,6 +7,10 @@ import (
 type ReleaseVersionEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*ReleaseVersionEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
-	println("ReleaseVersionEvent :", in.ReadString())
+func (e *ReleaseVersionEvent) Execute(gameClient core.IHabboClient, in core.IIncomingPacket) {
+	build := in.ReadString()
+	clientType := in.ReadString()
+	clientPlatform := in.ReadInt()
+	clientDeviceType := in.ReadInt()
+	println(build, clientType, clientPlatform, clientDeviceType)
 }

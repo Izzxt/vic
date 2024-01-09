@@ -54,12 +54,13 @@ func (ws *wsSocket) serveWs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ws.connection = conn
+	ws.client.SetHabbo(ws.habbo)
 	ws.client.SetSocket(ws)
 	ws.client.AddClient(ws.habbo)
 
 	go ws.client.ReadMessage()
 }
 
-func NewWsSocket(habbo core.IHabbo, client core.IHabboClient) core.ISocket {
-	return &wsSocket{habbo: habbo, client: client}
+func NewWsSocket(client core.IHabboClient) core.ISocket {
+	return &wsSocket{client: client}
 }

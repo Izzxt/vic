@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "args": [
-        "--check-go-version=false"
+        "--check-go-version=false",
       ],
       "program": "${workspaceFolder}/main.go"
     }

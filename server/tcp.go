@@ -51,6 +51,7 @@ func (tcp *tcpSocket) Start() error {
 		}
 		fmt.Println("acceped")
 		tcp.conn = conn
+		tcp.client.SetHabbo(tcp.habbo)
 		tcp.client.SetSocket(tcp)
 		tcp.client.AddClient(tcp.habbo)
 
@@ -63,6 +64,6 @@ func (*tcpSocket) Shutdown() error {
 	panic("unimplemented")
 }
 
-func NewTcpSocket(habbo core.IHabbo, client core.IHabboClient) core.ISocket {
-	return &tcpSocket{habbo: habbo, client: client}
+func NewTcpSocket(client core.IHabboClient) core.ISocket {
+	return &tcpSocket{client: client}
 }

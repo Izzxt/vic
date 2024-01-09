@@ -2,14 +2,17 @@ package handshake
 
 import (
 	"github.com/Izzxt/vic/core"
-	"github.com/Izzxt/vic/packets/outgoing/handshake"
+	"github.com/Izzxt/vic/hotel/habbo"
 )
 
 type SecureLoginEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*SecureLoginEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
-	println("SecureLoginEvent :", in.ReadString())
+func (e *SecureLoginEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+	ssoTicket := in.ReadString()
+	if ssoTicket == "" {
+		return
+	}
 
-	client.Send(&handshake.SecureLoginOKComposer{})
+	habbo.LoginHabboWithAuthTicket(client.GetContext(), ssoTicket, client)
 }

@@ -65,12 +65,17 @@ func (o *outgoingPacket) WriteShort(value int16) {
 // WriteString implements outgoingMessage.
 func (o *outgoingPacket) WriteString(value string) {
 	binary.Write(&o.bytes, binary.BigEndian, int16(len(value)))
-	binary.Write(&o.bytes, binary.BigEndian, []byte(value))
+	// binary.Write(&o.bytes, binary.BigEndian, []byte(value))
+	if len(value) > 0 {
+		binary.Write(&o.bytes, binary.BigEndian, []byte(value))
+	} else {
+		binary.Write(&o.bytes, binary.BigEndian, []byte(""))
+	}
 }
 
 func NewOutgoingPacket(header uint16, b []byte) core.IOutgoingPacket {
-	return &outgoingPacket{
-		header: header,
-		bytes:  *bytes.NewBuffer(b),
-	}
+	o := &outgoingPacket{}
+	o.header = header
+	o.bytes = *bytes.NewBuffer(b)
+	return o
 }

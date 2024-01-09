@@ -5,13 +5,11 @@ import (
 	"github.com/Izzxt/vic/packets/outgoing"
 )
 
-type SecureLoginOKComposer struct {
-	headerId uint16
-}
+type SecureLoginOKComposer struct{}
 
 // GetId implements core.IOutgoingMessage.
-func (*SecureLoginOKComposer) GetId() uint16 {
-	return outgoing.SecureLoginOkComposer
+func (c *SecureLoginOKComposer) GetId() uint16 {
+	return outgoing.SecureLoginOKComposer
 }
 
 // Compose implements core.IOutgoingMessage.

@@ -12,7 +12,7 @@ func Decode(b []byte, client core.IHabboClient) ([]byte, int32, int16) {
 
 	SendPolicy(*buf, client)
 
-	if buf.Len() < 4 {
+	if buf.Len() < 6 {
 	}
 
 	var length int32
