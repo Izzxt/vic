@@ -55,7 +55,7 @@ func (tcp *tcpSocket) Start() error {
 		tcp.client.SetSocket(tcp)
 		tcp.client.AddClient(tcp.habbo)
 
-		go tcp.client.ReadMessage()
+		// go tcp.client.ReadMessage()
 	}
 }
 

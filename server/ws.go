@@ -1,9 +1,6 @@
 package server
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/Izzxt/vic/core"
 	"github.com/gorilla/websocket"
 )
@@ -37,28 +34,12 @@ func (ws *wsSocket) Read() (int, []byte, error) {
 
 // Start implements socket.ISocket.
 func (ws *wsSocket) Start() error {
-	http.HandleFunc("/", ws.serveWs)
-	log.Fatal(http.ListenAndServe(":2097", nil))
 	return nil
 }
 
 // Shutdown implements socket.ISocket.
 func (*wsSocket) Shutdown() error {
 	panic("unimplemented")
-}
-
-func (ws *wsSocket) serveWs(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatalf("Error upgrading connection: %v", err)
-	}
-
-	ws.connection = conn
-	ws.client.SetHabbo(ws.habbo)
-	ws.client.SetSocket(ws)
-	ws.client.AddClient(ws.habbo)
-
-	go ws.client.ReadMessage()
 }
 
 func NewWsSocket(client core.IHabboClient) core.ISocket {

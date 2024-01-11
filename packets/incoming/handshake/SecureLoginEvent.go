@@ -14,5 +14,5 @@ func (e *SecureLoginEvent) Execute(client core.IHabboClient, in core.IIncomingPa
 		return
 	}
 
-	habbo.LoginHabboWithAuthTicket(client.GetContext(), ssoTicket, client)
+	go habbo.LoginHabboWithAuthTicket(client.GetContext(), ssoTicket, client)
 }

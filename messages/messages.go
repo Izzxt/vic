@@ -6,7 +6,6 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/packets/incoming"
-	"github.com/Izzxt/vic/packets/incoming/friends"
 	"github.com/Izzxt/vic/packets/incoming/habbo"
 	"github.com/Izzxt/vic/packets/incoming/handshake"
 	"github.com/Izzxt/vic/packets/incoming/hotelview"
@@ -55,28 +54,26 @@ func (m *messages) RegisterMessages() {
 	m.RegisterIncomingMessage(incoming.RequestHotelViewBonusRareEvent, &hotelview.RequestHotelViewBonusRareEvent{}) // 957
 	m.RegisterIncomingMessage(incoming.HotelViewDataEvent, &hotelview.HotelViewDataEvent{})                         // 2912
 
-	// Friends
-	m.RegisterIncomingMessage(incoming.RequestFriendsEvent, &friends.RequestFriendsEvent{})
-	m.RegisterIncomingMessage(incoming.RequestInitFriendsEvent, &friends.RequestInitFriendsEvent{})
+	// // Friends
+	// m.RegisterIncomingMessage(incoming.RequestFriendsEvent, &friends.RequestFriendsEvent{})
+	// m.RegisterIncomingMessage(incoming.RequestInitFriendsEvent, &friends.RequestInitFriendsEvent{})
 
-	// Room
+	// // Room
 	m.RegisterIncomingMessage(incoming.RequestRoomDataEvent, &room.RequestRoomDataEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomLoadEvent, &room.RequestRoomLoadEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomHeightmapEvent, &room.RequestRoomHeightmapEvent{})
 
-	// Room unit
+	// // Room unit
 	m.RegisterIncomingMessage(incoming.RoomUnitWalkEvent, &room_units.RoomUnitWalkEvent{})
 }
 
 // HandleMessages implements core.IMessages.
 func (m *messages) HandleMessages(client core.IHabboClient, packet core.IIncomingPacket) {
+	// m.handleMessageMutex.Lock()
+	// defer m.handleMessageMutex.Unlock()
 	if message, ok := incomingMessages[packet.GetHeader()]; ok {
-		m.handleMessageMutex.Lock()
 		message.Execute(client, packet)
 		fmt.Printf("Message %d handled\n", packet.GetHeader())
-		m.handleMessageMutex.Unlock()
-	} else {
-		fmt.Printf("\033[31mMessage %d not handled\n", packet.GetHeader())
 	}
 }
 

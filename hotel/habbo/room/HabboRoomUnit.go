@@ -59,8 +59,9 @@ func (h *habboRoomUnit) WalkTo(tile core.IRoomTile) {
 
 		time.Sleep(500 * time.Millisecond)
 		h.SetPreviousTile(dest[count])
+		h.SetCurrentTile(dest[count])
 		h.statuses[core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove)] = fmt.Sprintf("%d,%d,%d", next.GetX(), next.GetY(), next.GetHeight())
-		h.habbo.Client().SendToRoom(h.room, &room_units.RoomUnitStatusComposer{Habbos: []core.IHabbo{h.habbo}})
+		go h.habbo.Client().SendToRoom(h.room, &room_units.RoomUnitStatusComposer{Habbos: []core.IHabbo{h.habbo}})
 	}
 }
 
