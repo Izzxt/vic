@@ -12,7 +12,7 @@
       "args": [
         "--check-go-version=false",
       ],
-      "program": "${workspaceFolder}/main.go"
+      "program": "${workspaceFolder}/cmd/main.go"
     }
   ]
 }
