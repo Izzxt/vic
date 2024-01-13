@@ -53,7 +53,7 @@ func (r *Room) SuccessEnterRoom(habbo core.IHabbo) {
 	// send room unit
 	habbo.Client().SendToRoom(r, &room_units.RoomUnitComposer{Habbos: r.habbos})
 	// send room unit status
-	habbo.Client().SendToRoom(r, &room_units.RoomUnitStatusComposer{Habbos: r.habbos})
+	habbo.Client().SendToRoom(r, room_units.NewRoomUnitStatusWithRoomsComposer(habbo.RoomUnit()))
 
 }
 

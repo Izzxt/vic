@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Izzxt/vic/core"
+	"github.com/Izzxt/vic/list"
 )
 
 type RoomTileMap struct {
@@ -17,7 +18,7 @@ type RoomTileMap struct {
 }
 
 // FindPath implements core.IRoomTileMap.
-func (r *RoomTileMap) FindPath(start core.IRoomTile, goal core.IRoomTile) []core.IRoomTile {
+func (r *RoomTileMap) FindPath(start core.IRoomTile, goal core.IRoomTile) list.List[core.IRoomTile] {
 	closedSet := make(map[core.IRoomTile]bool)
 	openSet := make(map[core.IRoomTile]bool)
 	openSet[start] = true
@@ -51,7 +52,7 @@ func (r *RoomTileMap) FindPath(start core.IRoomTile, goal core.IRoomTile) []core
 				continue
 			}
 
-			tentativeGScore := gScore[current] + 1
+			tentativeGScore := gScore[current] + r.getMovementCost(current, neighbor)
 			if !openSet[neighbor] {
 				openSet[neighbor] = true
 			} else if tentativeGScore >= gScore[neighbor] {
@@ -72,61 +73,79 @@ func (*RoomTileMap) GetDistance(core.IRoomTile, core.IRoomTile) int32 {
 	panic("unimplemented")
 }
 
+func (r *RoomTileMap) getAdjacentTile(tile core.IRoomTile, dir core.RoomTileDirection) core.IRoomTile {
+	x := tile.GetX()
+	y := tile.GetY()
+
+	switch dir {
+	case DirectionNorth:
+		return r.GetTile(x, y-1)
+	case DirectionNorthEast:
+		return r.GetTile(x+1, y-1)
+	case DirectionEast:
+		return r.GetTile(x+1, y)
+	case DirectionSouthEast:
+		return r.GetTile(x+1, y+1)
+	case DirectionSouth:
+		return r.GetTile(x, y+1)
+	case DirectionSouthWest:
+		return r.GetTile(x-1, y+1)
+	case DirectionWest:
+		return r.GetTile(x-1, y)
+	case DirectionNorthWest:
+		return r.GetTile(x-1, y-1)
+	}
+	return nil
+}
+
 // GetNeighbors implements core.IRoomTileMap.
 func (r *RoomTileMap) GetNeighbors(current core.IRoomTile) []core.IRoomTile {
 	neighbors := make([]core.IRoomTile, 0)
-	x := current.GetX()
-	y := current.GetY()
 
-	if x > 0 {
-		neighbors = append(neighbors, r.tiles[x-1][y])
+	for dir := core.RoomTileDirection(0); dir < DirectionLimit; dir++ {
+		adjTile := r.getAdjacentTile(current, dir)
+		if adjTile == nil {
+			continue
+		}
+
+		if adjTile.GetState() == RoomTileStateOpen {
+			neighbors = append(neighbors, adjTile)
+		}
 	}
 
-	if x < r.width-1 {
-		neighbors = append(neighbors, r.tiles[x+1][y])
-	}
-
-	if y > 0 {
-		neighbors = append(neighbors, r.tiles[x][y-1])
-	}
-
-	if y < r.length-1 {
-		neighbors = append(neighbors, r.tiles[x][y+1])
-	}
-
-	if x > 0 && y > 0 {
-		neighbors = append(neighbors, r.tiles[x-1][y-1])
-	}
-
-	if x < r.width-1 && y < r.length-1 {
-		neighbors = append(neighbors, r.tiles[x+1][y+1])
-	}
-
-	if x > 0 && y < r.length-1 {
-		neighbors = append(neighbors, r.tiles[x-1][y+1])
-	}
-
-	if x < r.width-1 && y > 0 {
-		neighbors = append(neighbors, r.tiles[x+1][y-1])
-	}
 	return neighbors
 }
 
+var (
+	STRAIGHT_COST int32 = 10
+	DIAGONAL_COST int32 = 14
+)
+
 func (r *RoomTileMap) heuristic(start, end core.IRoomTile) int32 {
-	cal := math.Abs(float64(start.GetX()-end.GetX())) + math.Abs(float64(start.GetY()-end.GetY()))
+	dx := int32(math.Abs(float64(start.GetX() - end.GetX())))
+	dy := int32(math.Abs(float64(start.GetY() - end.GetY())))
+
+	cal := STRAIGHT_COST*(dx+dy) + (DIAGONAL_COST-STRAIGHT_COST)*int32(math.Min(float64(dx), float64(dy)))
 	return int32(cal)
 }
 
+func (r *RoomTileMap) getMovementCost(current, neighbor core.IRoomTile) int32 {
+	if current.GetX() == neighbor.GetX() || current.GetY() == neighbor.GetY() {
+		return STRAIGHT_COST
+	}
+	return DIAGONAL_COST
+}
+
 // ReconstructPath implements core.IRoomTileMap.
-func (*RoomTileMap) ReconstructPath(cameFrom map[core.IRoomTile]core.IRoomTile, current core.IRoomTile) []core.IRoomTile {
-	path := make([]core.IRoomTile, 0)
-	path = append(path, current)
+func (*RoomTileMap) ReconstructPath(cameFrom map[core.IRoomTile]core.IRoomTile, current core.IRoomTile) list.List[core.IRoomTile] {
+	path := list.New[core.IRoomTile](0)
+	path.Add(current)
 	for {
 		current = cameFrom[current]
 		if current == nil {
 			break
 		}
-		path = append(path, current)
+		path.Add(current)
 	}
 	return path
 }
@@ -196,7 +215,7 @@ func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
 				state = RoomTileStateBlocked
 			}
 
-			tiles[x][y] = NewRoomTile(int32(x), int32(y), int32(tileHeight), state)
+			tiles[x][y] = NewRoomTile(int32(x), int32(y), float32(tileHeight), state)
 			arrayTileCount++
 		}
 	}

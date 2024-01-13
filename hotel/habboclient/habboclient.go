@@ -2,7 +2,6 @@ package habboclient
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
 
@@ -104,7 +103,6 @@ func (h *habboClient) Send(out core.IOutgoingMessage) error {
 	if err != nil {
 		log.Fatalf("Error sending packet: %v", err)
 	}
-	fmt.Printf("\033[37mSent packet: %v to %v\n\033[0m", outgoingPacket.GetHeader(), h.GetHabbo().HabboInfo().Username)
 	return nil
 }
 

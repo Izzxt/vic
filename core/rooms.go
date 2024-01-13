@@ -2,6 +2,7 @@ package core
 
 import (
 	room_info "github.com/Izzxt/vic/database/rooms/room_info/querier"
+	"github.com/Izzxt/vic/list"
 )
 
 type IRoom interface {
@@ -21,8 +22,8 @@ type IRoomTileMap interface {
 	GetTile(int32, int32) IRoomTile
 	GetNeighbors(IRoomTile) []IRoomTile
 	GetDistance(IRoomTile, IRoomTile) int32
-	ReconstructPath(map[IRoomTile]IRoomTile, IRoomTile) []IRoomTile
-	FindPath(IRoomTile, IRoomTile) []IRoomTile
+	ReconstructPath(map[IRoomTile]IRoomTile, IRoomTile) list.List[IRoomTile]
+	FindPath(IRoomTile, IRoomTile) list.List[IRoomTile]
 	GetDoorTile() IRoomTile
 	GetDoorDirection() RoomTileDirection
 	GetCount() int32
@@ -38,7 +39,7 @@ type RoomTileDirection int
 type IRoomTile interface {
 	GetX() int32
 	GetY() int32
-	GetHeight() int32
+	GetHeight() float32
 	GetState() RoomTileState
 	HabboOnTiles() []IHabboRoomUnit
 	AddHabboRoomUnit(IHabboRoomUnit)

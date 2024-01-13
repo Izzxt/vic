@@ -3,7 +3,8 @@ package tiles
 import "github.com/Izzxt/vic/core"
 
 type RoomTile struct {
-	x, y, height int32
+	x, y         int32
+	height       float32
 	state        core.RoomTileState
 	habboOnTiles []core.IHabboRoomUnit
 }
@@ -26,7 +27,7 @@ func (r *RoomTile) RemoveHabboRoomUnit(h core.IHabboRoomUnit) {
 }
 
 // GetHeight implements core.IRoomTile.
-func (r *RoomTile) GetHeight() int32 {
+func (r *RoomTile) GetHeight() float32 {
 	return r.height
 }
 
@@ -45,6 +46,6 @@ func (r *RoomTile) GetY() int32 {
 	return r.y
 }
 
-func NewRoomTile(x int32, y int32, height int32, state core.RoomTileState) core.IRoomTile {
+func NewRoomTile(x int32, y int32, height float32, state core.RoomTileState) core.IRoomTile {
 	return &RoomTile{x: x, y: y, height: height, state: state}
 }

@@ -1,6 +1,8 @@
 package room
 
 import (
+	"context"
+
 	"github.com/Izzxt/vic/core"
 )
 
@@ -15,5 +17,5 @@ func (e *RoomUnitWalkEvent) Execute(client core.IHabboClient, in core.IIncomingP
 		return
 	}
 
-	client.GetHabbo().RoomUnit().WalkTo(tile)
+	go client.GetHabbo().RoomUnit().WalkTo(context.Background(), tile)
 }

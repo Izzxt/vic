@@ -62,6 +62,39 @@ func (l *list[T]) Values() []T {
 	return l.items
 }
 
+// Pop implements List.
+func (l *list[T]) Pop() {
+	l.items = l.items[:len(l.items)-1]
+}
+
+// PopFront implements List.
+func (l *list[T]) PopFront() {
+	l.items = l.items[1:]
+}
+
+// Reverse implements List.
+func (l *list[T]) Reverse() {
+	for i := len(l.items)/2 - 1; i >= 0; i-- {
+		opp := len(l.items) - 1 - i
+		l.items[i], l.items[opp] = l.items[opp], l.items[i]
+	}
+}
+
+// First implements List.
+func (l *list[T]) First() T {
+	return l.items[0]
+}
+
+// Last implements List.
+func (l *list[T]) Last() T {
+	return l.items[len(l.items)-1]
+}
+
+// IsEmpty implements List.
+func (l *list[T]) IsEmpty() bool {
+	return len(l.items) == 0
+}
+
 type List[T any] interface {
 	Add(T)
 	Remove(T)
@@ -69,6 +102,12 @@ type List[T any] interface {
 	Len() int
 	Values() []T
 	Get(T) (T, bool)
+	Pop()
+	PopFront()
+	Reverse()
+	First() T
+	Last() T
+	IsEmpty() bool
 }
 
 func New[T comparable](size int) List[T] {

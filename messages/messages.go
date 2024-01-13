@@ -73,7 +73,8 @@ func (m *messages) HandleMessages(client core.IHabboClient, packet core.IIncomin
 	// defer m.handleMessageMutex.Unlock()
 	if message, ok := incomingMessages[packet.GetHeader()]; ok {
 		message.Execute(client, packet)
-		fmt.Printf("Message %d handled\n", packet.GetHeader())
+	} else {
+		fmt.Printf("Message %d not handled\n", packet.GetHeader())
 	}
 }
 

@@ -1,6 +1,10 @@
 package core
 
-import users "github.com/Izzxt/vic/database/users/querier"
+import (
+	"context"
+
+	users "github.com/Izzxt/vic/database/users/querier"
+)
 
 type IHabbo interface {
 	HabboInfo() users.User
@@ -28,7 +32,7 @@ type IHabboRoomUnit interface {
 	SetRoom(IRoom)
 	SetHabbo(IHabbo)
 	Dispose()
-	WalkTo(IRoomTile)
+	WalkTo(context.Context, IRoomTile)
 	Statuses() map[HabboRoomUnitStatus]string
 }
 
