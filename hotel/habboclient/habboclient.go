@@ -95,6 +95,8 @@ func (h *habboClient) RemoveClient(habbo core.IHabbo) {
 
 // Send implements core.IHabboClient.
 func (h *habboClient) Send(out core.IOutgoingMessage) error {
+	h.cmu.Lock()
+	defer h.cmu.Unlock()
 	bytes := make([]byte, 6)
 	outgoingPacket := messages.NewOutgoingPacket(out.GetId(), bytes)
 	compose := out.Compose(outgoingPacket)

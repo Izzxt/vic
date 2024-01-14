@@ -48,57 +48,63 @@ func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile) {
 	if h.room == nil {
 		return
 	}
+
 	ctx, cancel := context.WithCancel(ctx)
 
 	h.SetPreviousTile(tile)
 
-	algo := h.Room().TileMap().FindPath(h.CurrentTile(), h.previousTile)
+	h.goal = tile
 
-	delay := time.NewTicker(250 * time.Millisecond)
-	ticker := time.NewTicker(500 * time.Millisecond)
-	go func() {
-		for {
-			<-delay.C
-			if algo.Len() == 0 {
-				delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
+	delay := 500 * time.Millisecond
+	var t *time.Timer
+	t = time.AfterFunc(0*time.Millisecond, func() {
+		go PereodicallyDo(ctx, delay, func(ctx context.Context, ticker time.Ticker, _ time.Time, wg *sync.WaitGroup) {
+			defer wg.Done()
+			algo := h.Room().TileMap().FindPath(h.currentTile, h.goal)
+			// algo.Reverse()
+			algo.Pop()
+
+			if h.goal == nil {
+				ticker.Reset(delay)
+				t.Reset(delay)
+
 				cancel()
-			}
-
-			select {
-			case <-ticker.C:
-
-				next := algo.Last()
-
-				if next == h.currentTile {
-					algo.Pop()
-					continue
-				}
-
-				fmt.Println(next.GetX(), next.GetY(), next.GetHeight())
-
-				direction := tiles.GetRoomTileDirection(h.CurrentTile(), next)
-				h.SetBodyRotation(direction)
-				h.SetHeadRotation(direction)
-
-				h.statusMutex.Lock()
-				h.statuses[core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove)] = fmt.Sprintf("%d,%d,%.1f", next.GetX(), next.GetY(), next.GetHeight())
-				h.statusMutex.Unlock()
-
-				h.SetPreviousTile(algo.Last())
-
-				h.SetCurrentTile(next)
-
-				algo.Pop()
-
-				go h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer([]core.IHabbo{h.habbo}))
-
-			case <-ctx.Done():
-				ticker.Stop()
 				return
 			}
-		}
 
-	}()
+			if algo.IsEmpty() {
+				delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
+				t.Reset(delay)
+				ticker.Reset(delay)
+				cancel()
+				return
+			}
+
+			next := algo.Last()
+
+			if next == h.currentTile {
+				algo.Pop()
+				delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
+				t.Reset(delay)
+				ticker.Reset(delay)
+				cancel()
+				return
+			}
+
+			direction := tiles.GetRoomTileDirection(h.CurrentTile(), next)
+			h.SetBodyRotation(direction)
+			h.SetHeadRotation(direction)
+
+			h.statusMutex.Lock()
+			h.statuses[core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove)] = fmt.Sprintf("%d,%d,%.1f", next.GetX(), next.GetY(), next.GetHeight())
+			h.statusMutex.Unlock()
+
+			h.SetPreviousTile(h.currentTile)
+			h.SetCurrentTile(next)
+
+			go h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(h.room.GetHabbos()))
+		})
+	})
 }
 
 func (h *habboRoomUnit) ID() int32 {
@@ -162,4 +168,22 @@ func NewHabboRoomUnit(id int32, habbo core.IHabbo, room core.IRoom, currentTile 
 	habboRoomUnit.statuses = make(map[core.HabboRoomUnitStatus]string)
 	currentTile.AddHabboRoomUnit(habboRoomUnit)
 	return habboRoomUnit
+}
+
+func PereodicallyDo(ctx context.Context, delay time.Duration, f func(ctx context.Context, ticker time.Ticker, time time.Time, wg *sync.WaitGroup)) {
+	wg := sync.WaitGroup{}
+	ticker := time.NewTicker(delay)
+	go func() {
+		for {
+			wg.Add(1)
+			select {
+			case <-ctx.Done():
+				ticker.Stop()
+				return
+			case now := <-ticker.C:
+				f(ctx, *ticker, now, &wg)
+			}
+		}
+	}()
+	wg.Wait()
 }

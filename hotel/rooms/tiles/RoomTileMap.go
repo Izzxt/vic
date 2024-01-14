@@ -1,6 +1,8 @@
 package tiles
 
 import (
+	"container/heap"
+	"fmt"
 	"math"
 	"strings"
 
@@ -14,14 +16,16 @@ type RoomTileMap struct {
 	doorDir  core.RoomTileDirection
 	count    int32
 	width    int32
-	length   int32
+	height   int32
 }
 
 // FindPath implements core.IRoomTileMap.
 func (r *RoomTileMap) FindPath(start core.IRoomTile, goal core.IRoomTile) list.List[core.IRoomTile] {
-	closedSet := make(map[core.IRoomTile]bool)
-	openSet := make(map[core.IRoomTile]bool)
-	openSet[start] = true
+	// closedSet := make(map[core.IRoomTile]bool)
+	var count int = 0
+	openSet := PriorityQueue{}
+	heap.Init(&openSet)
+	heap.Push(&openSet, &Item{value: start, index: count, priority: 0})
 	cameFrom := make(map[core.IRoomTile]core.IRoomTile)
 
 	gScore := make(map[core.IRoomTile]int32)
@@ -30,42 +34,45 @@ func (r *RoomTileMap) FindPath(start core.IRoomTile, goal core.IRoomTile) list.L
 	fScore := make(map[core.IRoomTile]int32)
 	fScore[start] = r.heuristic(start, goal)
 
-	for len(openSet) > 0 {
-		var current core.IRoomTile
-		var currentScore int32 = math.MaxInt32
-		for tile := range openSet {
-			if fScore[tile] < currentScore {
-				current = tile
-				currentScore = fScore[tile]
-			}
+	openSetHash := list.New[core.IRoomTile](0)
+	openSetHash.Add(start)
+
+	for openSet.Len() > 0 {
+		var current *Item
+		// var currentScore int32 = math.MaxInt32
+
+		current = heap.Pop(&openSet).(*Item)
+		if current.value == goal {
+			return r.ReconstructPath(cameFrom, current.value)
 		}
 
-		if current == goal {
-			return r.ReconstructPath(cameFrom, current)
-		}
+		openSet.Remove(current.index)
+		for _, neighbor := range r.GetNeighbors(current.value) {
+			tentativeGScore := int32(getOrDefault(gScore, current.value, math.MaxInt32)) + r.getMovementCost(current.value, neighbor)
+			// tentativeGScore := gScore[current.value] + r.getMovementCost(current.value, neighbor)
+			if tentativeGScore < int32(getOrDefault(gScore, neighbor, math.MaxInt32)) {
+				// if tentativeGScore < gScore[neighbor] {
+				cameFrom[neighbor] = current.value
+				gScore[neighbor] = tentativeGScore
+				fScore[neighbor] = tentativeGScore + r.heuristic(neighbor, goal)
 
-		delete(openSet, current)
-		closedSet[current] = true
-
-		for _, neighbor := range r.GetNeighbors(current) {
-			if closedSet[neighbor] {
-				continue
+				if !openSetHash.Contains(neighbor) {
+					count++
+					heap.Push(&openSet, &Item{value: neighbor, priority: int(fScore[neighbor]), index: count})
+					openSetHash.Add(neighbor)
+				}
 			}
-
-			tentativeGScore := gScore[current] + r.getMovementCost(current, neighbor)
-			if !openSet[neighbor] {
-				openSet[neighbor] = true
-			} else if tentativeGScore >= gScore[neighbor] {
-				continue
-			}
-
-			cameFrom[neighbor] = current
-			gScore[neighbor] = tentativeGScore
-			fScore[neighbor] = tentativeGScore + r.heuristic(neighbor, goal)
 		}
 	}
 
 	return nil
+}
+
+func getOrDefault(m map[core.IRoomTile]int32, key core.IRoomTile, defaultValue int32) int32 {
+	if val, ok := m[key]; ok {
+		return val
+	}
+	return defaultValue
 }
 
 // GetDistance implements core.IRoomTileMap.
@@ -76,6 +83,8 @@ func (*RoomTileMap) GetDistance(core.IRoomTile, core.IRoomTile) int32 {
 func (r *RoomTileMap) getAdjacentTile(tile core.IRoomTile, dir core.RoomTileDirection) core.IRoomTile {
 	x := tile.GetX()
 	y := tile.GetY()
+
+	fmt.Printf("x: %#v y: %#v\n", x, y)
 
 	switch dir {
 	case DirectionNorth:
@@ -152,7 +161,7 @@ func (*RoomTileMap) ReconstructPath(cameFrom map[core.IRoomTile]core.IRoomTile, 
 
 // GetLength implements core.IRoomTileMap.
 func (r *RoomTileMap) GetLength() int32 {
-	return r.length
+	return r.height
 }
 
 // implements getter for RoomTileMap
@@ -177,7 +186,7 @@ func (r *RoomTileMap) GetWidth() int32 {
 
 // implements getter for RoomTileMap
 func (r *RoomTileMap) GetHeight() int32 {
-	return r.length
+	return r.height
 }
 
 func (r *RoomTileMap) GetTile(x, y int32) core.IRoomTile {
@@ -200,13 +209,13 @@ func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
 	heightmap := strings.Split(replace, "\r")
 
 	tileMap.width = int32(len(heightmap[0]))
-	tileMap.length = int32(len(heightmap))
+	tileMap.height = int32(len(heightmap))
 
 	arrayTileCount := 0
 	tiles := make([][]core.IRoomTile, tileMap.width)
 	for x := 0; x < int(tileMap.width); x++ {
-		tiles[x] = make([]core.IRoomTile, tileMap.length)
-		for y := 0; y < int(tileMap.length); y++ {
+		tiles[x] = make([]core.IRoomTile, tileMap.height)
+		for y := 0; y < int(tileMap.height); y++ {
 			heightmapChar := heightmap[y][x]
 			tileHeight := parse(heightmapChar)
 
@@ -219,9 +228,12 @@ func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
 			arrayTileCount++
 		}
 	}
+
+	fmt.Printf("%#v\n", tileMap)
 	tileMap.tiles = tiles
 	tileMap.count = int32(arrayTileCount)
 	tileMap.doorTile = tileMap.GetTile(model.GetX(), model.GetY())
 	tileMap.doorDir = core.RoomTileDirection(model.GetDir())
+	fmt.Printf("x: %#v y: %#v\n", len(tileMap.tiles), len(tileMap.tiles[0]))
 	return tileMap
 }

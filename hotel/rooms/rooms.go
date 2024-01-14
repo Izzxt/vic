@@ -40,8 +40,8 @@ func (r *Room) SetModel(model core.IRoomModel) {
 // SuccessEnterRoom implements core.IRoom.
 func (r *Room) SuccessEnterRoom(habbo core.IHabbo) {
 	// habbo room unit
-	counter++
 	roomUnit := habbo_unit.NewHabboRoomUnit(counter, habbo, r, r.tileMap.GetDoorTile(), r.TileMap().GetDoorDirection())
+	counter++
 	roomUnit.SetPreviousTile(r.tileMap.GetDoorTile())
 	habbo.SetRoomUnit(roomUnit)
 	// update room habbos size
