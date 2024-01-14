@@ -84,8 +84,6 @@ func (r *RoomTileMap) getAdjacentTile(tile core.IRoomTile, dir core.RoomTileDire
 	x := tile.GetX()
 	y := tile.GetY()
 
-	fmt.Printf("x: %#v y: %#v\n", x, y)
-
 	switch dir {
 	case DirectionNorth:
 		return r.GetTile(x, y-1)
