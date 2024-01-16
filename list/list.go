@@ -11,6 +11,10 @@ func (l *list[T]) Add(item T) {
 
 // Contains implements List.
 func (l *list[T]) Contains(item T) bool {
+	if l.Len() == 0 {
+		return false
+	}
+
 	for _, i := range l.items {
 		if i == item {
 			return true
@@ -22,6 +26,11 @@ func (l *list[T]) Contains(item T) bool {
 
 // Get implements List.
 func (l *list[T]) Get(item T) (T, bool) {
+	var value T
+	if l.Len() == 0 {
+		return value, false
+	}
+
 	has := false
 	for _, i := range l.items {
 		if i == item {
@@ -59,34 +68,49 @@ func (l *list[T]) copy(a, b []T) []T {
 
 // Values implements List.
 func (l *list[T]) Values() []T {
+	if l.Len() == 0 {
+		return nil
+	}
 	return l.items
 }
 
 // Pop implements List.
-func (l *list[T]) Pop() {
+func (l *list[T]) Pop() List[T] {
 	l.items = l.items[:len(l.items)-1]
+	return l
 }
 
 // PopFront implements List.
-func (l *list[T]) PopFront() {
+func (l *list[T]) PopFront() List[T] {
 	l.items = l.items[1:]
+	return l
 }
 
 // Reverse implements List.
-func (l *list[T]) Reverse() {
+func (l *list[T]) Reverse() List[T] {
 	for i := len(l.items)/2 - 1; i >= 0; i-- {
 		opp := len(l.items) - 1 - i
 		l.items[i], l.items[opp] = l.items[opp], l.items[i]
 	}
+	return l
 }
 
 // First implements List.
 func (l *list[T]) First() T {
+	var value T
+	if l.Len() == 0 {
+		return value
+	}
+
 	return l.items[0]
 }
 
 // Last implements List.
 func (l *list[T]) Last() T {
+	var value T
+	if l.Len() == 0 {
+		return value
+	}
 	return l.items[len(l.items)-1]
 }
 
@@ -102,9 +126,9 @@ type List[T any] interface {
 	Len() int
 	Values() []T
 	Get(T) (T, bool)
-	Pop()
-	PopFront()
-	Reverse()
+	Pop() List[T]
+	PopFront() List[T]
+	Reverse() List[T]
 	First() T
 	Last() T
 	IsEmpty() bool
