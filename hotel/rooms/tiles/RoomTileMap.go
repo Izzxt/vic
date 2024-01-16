@@ -2,7 +2,6 @@ package tiles
 
 import (
 	"container/heap"
-	"fmt"
 	"math"
 	"strings"
 
@@ -115,7 +114,7 @@ func (r *RoomTileMap) GetNeighbors(current core.IRoomTile) []core.IRoomTile {
 			continue
 		}
 
-		if adjTile.GetState() == RoomTileStateOpen {
+		if adjTile.GetState() == RoomTileStateOpen && adjTile.GetHeight() <= current.GetHeight()+1 {
 			neighbors = append(neighbors, adjTile)
 		}
 	}
@@ -188,6 +187,9 @@ func (r *RoomTileMap) GetHeight() int32 {
 }
 
 func (r *RoomTileMap) GetTile(x, y int32) core.IRoomTile {
+	if x < 0 || y < 0 || x >= r.width || y >= r.height {
+		return nil
+	}
 	return r.tiles[x][y]
 }
 
@@ -203,8 +205,7 @@ func parse(input byte) int {
 func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
 	tileMap := new(RoomTileMap)
 
-	replace := strings.ReplaceAll(model.GetHeightmap(), "\n", "")
-	heightmap := strings.Split(replace, "\r")
+	heightmap := strings.Split(model.GetHeightmap(), "\r\n")
 
 	tileMap.width = int32(len(heightmap[0]))
 	tileMap.height = int32(len(heightmap))
@@ -227,11 +228,9 @@ func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
 		}
 	}
 
-	fmt.Printf("%#v\n", tileMap)
 	tileMap.tiles = tiles
 	tileMap.count = int32(arrayTileCount)
 	tileMap.doorTile = tileMap.GetTile(model.GetX(), model.GetY())
 	tileMap.doorDir = core.RoomTileDirection(model.GetDir())
-	fmt.Printf("x: %#v y: %#v\n", len(tileMap.tiles), len(tileMap.tiles[0]))
 	return tileMap
 }
