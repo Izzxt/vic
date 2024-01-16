@@ -16,9 +16,8 @@ func (r HeightMapComposer) GetId() uint16 {
 }
 
 func (r HeightMapComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
-	replace := strings.ReplaceAll(r.Room.Model().GetHeightmap(), "\r", "")
 	compose.WriteBool(true)
-	compose.WriteInt(r.Room.Info().GetWallHeight())              // fixed wall height
-	compose.WriteString(strings.ReplaceAll(replace, "\n", "\r")) // relative Room
+	compose.WriteInt(r.Room.Info().GetWallHeight())                                      // fixed wall height
+	compose.WriteString(strings.ReplaceAll(r.Room.Model().GetHeightmap(), "\r\n", "\r")) // relative Room
 	return compose
 }
