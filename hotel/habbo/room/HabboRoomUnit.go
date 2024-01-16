@@ -8,6 +8,7 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/hotel/rooms/tiles"
+	"github.com/Izzxt/vic/list"
 	room_units "github.com/Izzxt/vic/packets/outgoing/room/units"
 )
 
@@ -20,11 +21,12 @@ type habboRoomUnit struct {
 	previousTile core.IRoomTile
 	headRotation core.RoomTileDirection
 	bodyRotation core.RoomTileDirection
-	goal         core.IRoomTile
-	start        core.IRoomTile
+	goalTile     core.IRoomTile
+	goalPath     list.List[core.IRoomTile]
 	statuses     map[core.HabboRoomUnitStatus]string
 	statusMutex  sync.Mutex
 	t            *time.Timer
+	ticker       *time.Ticker
 }
 
 // p	panic("unimplemented")tatuses implements core.IHabboRoomUnit.
@@ -45,40 +47,35 @@ func (h *habboRoomUnit) SetPreviousTile(tile core.IRoomTile) {
 }
 
 // WalkTo implements core.IHabboRoomUnit.
-func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile) {
+func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile, client core.IHabboClient) {
 	if h.room == nil {
 		return
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	h.goalTile = tile
 
-	h.goal = tile
+	if h.ticker == nil {
+		ctx, cancel := context.WithCancel(ctx)
 
-	if h.t != nil {
-		// cancel()
-		// h.t.Stop()
-	}
-
-	delay := 500 * time.Millisecond
-	h.t = time.AfterFunc(0*time.Millisecond, func() {
-		PereodicallyDo(ctx, delay, func(ctx context.Context, ticker *time.Ticker, _ time.Time, wg *sync.WaitGroup) {
+		delay := 500 * time.Millisecond
+		h.ticker = PereodicallyDo(ctx, delay, func(ctx context.Context, ticker *time.Ticker, _ time.Time, wg *sync.WaitGroup) {
 			defer wg.Done()
-			algo := h.Room().TileMap().FindPath(h.currentTile, h.goal)
-			algo.Pop()
+			h.goalPath = h.Room().TileMap().FindPath(h.currentTile, h.goalTile).Pop()
 
-			if h.goal == nil {
-				delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
-				cancel()
+			next := h.goalPath.Last()
+
+			if h.goalTile == nil {
+				h.stopWalking(cancel)
+				return
 			}
 
-			if algo.IsEmpty() {
-				cancel()
+			if h.goalPath.IsEmpty() {
+				h.stopWalking(cancel)
+				return
 			}
 
-			next := algo.Last()
-			if next == tile {
-				algo.Pop()
-				cancel()
+			if next == h.currentTile {
+				h.goalPath = h.goalPath.Pop()
 			}
 
 			direction := tiles.GetRoomTileDirection(h.CurrentTile(), next)
@@ -92,9 +89,23 @@ func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile) {
 			h.SetPreviousTile(h.currentTile)
 			h.SetCurrentTile(next)
 
-			go h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer([]core.IHabbo{h.habbo}))
+			client.SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(client.GetHabbo().RoomUnit().Room().GetHabbos()))
 		})
-	})
+	}
+}
+
+func (h *habboRoomUnit) stopWalking(cancel context.CancelFunc) {
+	h.SetPreviousTile(h.currentTile)
+
+	delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
+	h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(h.Room().GetHabbos()))
+
+	h.ticker.Stop()
+	cancel()
+	h.ticker = nil
+
+	h.goalTile = nil
+	h.goalPath = nil
 }
 
 func (h *habboRoomUnit) ID() int32 {
@@ -160,7 +171,7 @@ func NewHabboRoomUnit(id int32, habbo core.IHabbo, room core.IRoom, currentTile 
 	return habboRoomUnit
 }
 
-func PereodicallyDo(ctx context.Context, delay time.Duration, f func(ctx context.Context, ticker *time.Ticker, time time.Time, wg *sync.WaitGroup)) {
+func PereodicallyDo(ctx context.Context, delay time.Duration, f func(ctx context.Context, ticker *time.Ticker, time time.Time, wg *sync.WaitGroup)) *time.Ticker {
 	wg := sync.WaitGroup{}
 	ticker := time.NewTicker(delay)
 	go func() {
@@ -168,7 +179,6 @@ func PereodicallyDo(ctx context.Context, delay time.Duration, f func(ctx context
 			wg.Add(1)
 			select {
 			case <-ctx.Done():
-				ticker.Stop()
 				return
 			case now := <-ticker.C:
 				f(ctx, ticker, now, &wg)
@@ -176,4 +186,6 @@ func PereodicallyDo(ctx context.Context, delay time.Duration, f func(ctx context
 		}
 	}()
 	wg.Wait()
+
+	return ticker
 }
