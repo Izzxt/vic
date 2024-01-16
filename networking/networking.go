@@ -63,8 +63,9 @@ func (n *networking) Close() {
 }
 
 func (n *networking) readMessage(conn *websocket.Conn) {
-	n.client = habboclient.NewHabboClient(n.ctx, conn, n.navigator, n.room)
+	wg := &sync.WaitGroup{}
 	for {
+		wg.Add(1)
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			n.removeClient(n.client)
@@ -76,9 +77,14 @@ func (n *networking) readMessage(conn *websocket.Conn) {
 		n.client.SetConnection(conn)
 		n.addClient(n.client)
 
-		data, _, header := codec.Decode(msg, n.client)
-		incomingPacket := messages.NewIncomingPacket(header, data)
-		n.messages.HandleMessages(n.client, incomingPacket)
+		go func() {
+			defer wg.Done()
+			data, _, header := codec.Decode(msg, n.client)
+			incomingPacket := messages.NewIncomingPacket(header, data)
+			n.messages.HandleMessages(n.client, incomingPacket)
+		}()
+
+		wg.Wait()
 	}
 }
 
@@ -87,6 +93,8 @@ func (n *networking) serveWs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Error upgrading connection: %v", err)
 	}
+
+	n.client = habboclient.NewHabboClient(n.ctx, conn, n.navigator, n.room)
 
 	go n.readMessage(conn)
 }
