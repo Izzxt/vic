@@ -7,6 +7,6 @@ import (
 
 type RequestMeMenuSettingsEvent struct{}
 
-func (r RequestMeMenuSettingsEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (r RequestMeMenuSettingsEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	client.Send(&habbo.MeMenuSettingsComposer{})
 }

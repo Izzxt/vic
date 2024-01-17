@@ -25,6 +25,6 @@ func (n *navigatorFlatCats) GetCategories() []navigator_flat_cats.NavigatorFlatC
 	return cats
 }
 
-func NewNavigatorFlatCats(ctx context.Context) core.INavigatorFlatCats {
+func NewNavigatorFlatCats(ctx context.Context) core.NavigatorFlatCats {
 	return &navigatorFlatCats{ctx: ctx}
 }

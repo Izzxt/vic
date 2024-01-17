@@ -13,7 +13,7 @@ func (c *AvailabilityStatusComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (*AvailabilityStatusComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (*AvailabilityStatusComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteBool(true)
 	compose.WriteBool(false)
 	compose.WriteBool(true)

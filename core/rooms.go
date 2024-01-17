@@ -5,17 +5,18 @@ import (
 	"github.com/Izzxt/vic/list"
 )
 
-type IRoom interface {
+type Room interface {
 	Model() IRoomModel
 	Info() IRoomInfo
-	EnterRoom(IHabbo)
-	LeaveRoom(IHabbo, bool)
-	PrepareRoom(IHabbo)
-	UnloadRoom(IHabbo)
-	SuccessEnterRoom(IHabbo)
+	EnterRoom(Habbo)
+	LeaveRoom(Habbo, bool)
+	PrepareRoom(Habbo)
+	UnloadRoom(Habbo)
+	SuccessEnterRoom(Habbo)
 	SetModel(IRoomModel)
 	TileMap() IRoomTileMap
-	GetHabbos() []IHabbo
+	GetHabbos() []Habbo
+	GetHabbo(int32) Habbo
 }
 
 type IRoomTileMap interface {
@@ -41,13 +42,13 @@ type IRoomTile interface {
 	GetY() int32
 	GetHeight() float32
 	GetState() RoomTileState
-	HabboOnTiles() []IHabboRoomUnit
-	AddHabboRoomUnit(IHabboRoomUnit)
-	RemoveHabboRoomUnit(IHabboRoomUnit)
+	HabboOnTiles() []HabboRoomUnit
+	AddHabboRoomUnit(HabboRoomUnit)
+	RemoveHabboRoomUnit(HabboRoomUnit)
 }
 
-type IRoomManager interface {
-	GetRoom(int32) IRoom
+type RoomManager interface {
+	GetRoom(int32) Room
 }
 
 type IRoomModel interface {

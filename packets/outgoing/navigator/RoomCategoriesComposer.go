@@ -13,7 +13,7 @@ type RoomCategoriesComposer struct {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *RoomCategoriesComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *RoomCategoriesComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(int32(len(c.RoomCategory)))
 	for _, category := range c.RoomCategory {
 		compose.WriteInt(category.ID)

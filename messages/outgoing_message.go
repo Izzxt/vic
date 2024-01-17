@@ -73,7 +73,7 @@ func (o *outgoingPacket) WriteString(value string) {
 	}
 }
 
-func NewOutgoingPacket(header uint16, b []byte) core.IOutgoingPacket {
+func NewOutgoingPacket(header uint16, b []byte) core.OutgoingPacket {
 	o := &outgoingPacket{}
 	o.header = header
 	o.bytes = *bytes.NewBuffer(b)

@@ -17,17 +17,18 @@ import (
 type manager struct{ ctx context.Context }
 
 var (
-	connectedClients             = make(map[int]core.IHabbo)
-	Habbos                       = make(map[*websocket.Conn]core.IHabbo)
+	connectedClients             = make(map[int]core.Habbo)
+	Habbos                       = make(map[*websocket.Conn]core.Habbo)
 	mu               *sync.Mutex = &sync.Mutex{}
 )
 
-func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client core.IHabboClient) {
+func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client core.HabboClient) {
 	habbo := loadHabbo(ctx, authTicket, client)
 
 	if h, ok := connectedClients[int(habbo.HabboInfo().ID)]; ok {
-		fmt.Printf("Habbo already logged in: %v", h.HabboInfo().Username)
+		fmt.Printf("Habbo already logged in: %v\n", h.HabboInfo().Username)
 		delete(connectedClients, int(h.HabboInfo().ID))
+		h.Client().Connection().Close()
 	}
 	client.SetHabbo(habbo)
 	connectedClients[int(habbo.HabboInfo().ID)] = habbo
@@ -41,7 +42,7 @@ func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client cor
 	client.Send(&handshake.PingComposer{})
 }
 
-func loadHabbo(ctx context.Context, authTicket string, client core.IHabboClient) core.IHabbo {
+func loadHabbo(ctx context.Context, authTicket string, client core.HabboClient) core.Habbo {
 	user, err := database.GetInstance().Users().GetUserByAuthTicket(context.Background(), authTicket)
 	if err != nil {
 		log.Fatalf("Error loading habbo: %v", err) //TODO: check for auth ticket missing

@@ -19,11 +19,11 @@ type Room struct {
 	model   core.IRoomModel
 	info    core.IRoomInfo
 	tileMap core.IRoomTileMap
-	habbos  []core.IHabbo
+	habbos  []core.Habbo
 }
 
 // GetHabbos implements core.IRoom.
-func (r *Room) GetHabbos() []core.IHabbo {
+func (r *Room) GetHabbos() []core.Habbo {
 	return r.habbos
 }
 
@@ -38,7 +38,7 @@ func (r *Room) SetModel(model core.IRoomModel) {
 }
 
 // SuccessEnterRoom implements core.IRoom.
-func (r *Room) SuccessEnterRoom(habbo core.IHabbo) {
+func (r *Room) SuccessEnterRoom(habbo core.Habbo) {
 	// habbo room unit
 	roomUnit := habbo_unit.NewHabboRoomUnit(counter, habbo, r, r.tileMap.GetDoorTile(), r.TileMap().GetDoorDirection())
 	counter++
@@ -58,7 +58,7 @@ func (r *Room) SuccessEnterRoom(habbo core.IHabbo) {
 }
 
 // EnterRoom implements core.IRoom.
-func (r *Room) EnterRoom(habbo core.IHabbo) {
+func (r *Room) EnterRoom(habbo core.Habbo) {
 	if habbo == nil {
 		habbo.Room().LeaveRoom(habbo, true)
 	}
@@ -71,7 +71,7 @@ func (r *Room) EnterRoom(habbo core.IHabbo) {
 }
 
 // LeaveRoom implements core.IRoom.
-func (r *Room) LeaveRoom(habbo core.IHabbo, hotelview bool) {
+func (r *Room) LeaveRoom(habbo core.Habbo, hotelview bool) {
 
 	habbo.SetRoom(nil)
 
@@ -79,7 +79,7 @@ func (r *Room) LeaveRoom(habbo core.IHabbo, hotelview bool) {
 
 }
 
-func (r *Room) GetHabbo(id int32) core.IHabbo {
+func (r *Room) GetHabbo(id int32) core.Habbo {
 	for _, habbo := range r.habbos {
 		if habbo.HabboInfo().ID == id {
 			return habbo
@@ -88,7 +88,7 @@ func (r *Room) GetHabbo(id int32) core.IHabbo {
 	return nil
 }
 
-func (r *Room) RemoveHabbo(habbo core.IHabbo) {
+func (r *Room) RemoveHabbo(habbo core.Habbo) {
 	for i, h := range r.habbos {
 		if h.HabboInfo().ID == habbo.HabboInfo().ID {
 			r.habbos = append(r.habbos[:i], r.habbos[i+1:]...)
@@ -98,7 +98,7 @@ func (r *Room) RemoveHabbo(habbo core.IHabbo) {
 }
 
 // PrepareRoom implements core.IRoom.
-func (r *Room) PrepareRoom(habbo core.IHabbo) {
+func (r *Room) PrepareRoom(habbo core.Habbo) {
 	habbo.SetRoom(r)
 	r.habbos = append(r.habbos, habbo)
 
@@ -109,7 +109,7 @@ func (r *Room) PrepareRoom(habbo core.IHabbo) {
 }
 
 // UnloadRoom implements core.IRoom.
-func (*Room) UnloadRoom(core.IHabbo) {
+func (*Room) UnloadRoom(core.Habbo) {
 	panic("unimplemented")
 }
 
@@ -129,9 +129,9 @@ func (r *Room) Info() core.IRoomInfo {
 	return r.info
 }
 
-func NewRoom(ctx context.Context, roomInfo core.IRoomInfo) core.IRoom {
+func NewRoom(ctx context.Context, roomInfo core.IRoomInfo) core.Room {
 	room := Room{}
 	room.info = roomInfo
-	room.habbos = make([]core.IHabbo, 0)
+	room.habbos = make([]core.Habbo, 0)
 	return &room
 }

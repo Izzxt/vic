@@ -7,7 +7,7 @@ import (
 type ReleaseVersionEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *ReleaseVersionEvent) Execute(gameClient core.IHabboClient, in core.IIncomingPacket) {
+func (e *ReleaseVersionEvent) Execute(gameClient core.HabboClient, in core.IncomingPacket) {
 	build := in.ReadString()
 	clientType := in.ReadString()
 	clientPlatform := in.ReadInt()

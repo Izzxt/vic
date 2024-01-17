@@ -11,7 +11,7 @@ func (r RoomUserStatusComposer) GetId() uint16 {
 	return outgoing.RoomUserStatusComposer
 }
 
-func (r RoomUserStatusComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (r RoomUserStatusComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(1)
 
 	for i := 0; i < 1; i++ {

@@ -10,7 +10,7 @@ import (
 type HotelViewDataEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*HotelViewDataEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (*HotelViewDataEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 
 	data := in.ReadString()
 	if strings.Contains(data, ";") {

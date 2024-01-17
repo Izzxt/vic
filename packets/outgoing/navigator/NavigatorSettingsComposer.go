@@ -16,7 +16,7 @@ func (c *NavigatorSettingsComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *NavigatorSettingsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NavigatorSettingsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(c.HomeRoomId)
 	compose.WriteInt(c.RoomId)
 	return compose

@@ -5,7 +5,7 @@ import (
 	"github.com/Izzxt/vic/packets/outgoing"
 )
 
-type UserCreditsComposer struct{ Habbo core.IHabbo }
+type UserCreditsComposer struct{ Habbo core.Habbo }
 
 // GetId implements core.IOutgoingMessage.
 func (c *UserCreditsComposer) GetId() uint16 {
@@ -13,7 +13,7 @@ func (c *UserCreditsComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *UserCreditsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *UserCreditsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteString("50000.0")
 	return compose
 }

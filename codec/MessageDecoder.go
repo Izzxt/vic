@@ -7,7 +7,7 @@ import (
 	"github.com/Izzxt/vic/core"
 )
 
-func Decode(b []byte, client core.IHabboClient) ([]byte, int32, int16) {
+func Decode(b []byte, client core.HabboClient) ([]byte, int32, int16) {
 	buf := bytes.NewBuffer(b)
 
 	SendPolicy(*buf, client)

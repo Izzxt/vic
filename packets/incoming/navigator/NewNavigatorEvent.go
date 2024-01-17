@@ -8,7 +8,7 @@ import (
 type NewNavigatorEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*NewNavigatorEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (*NewNavigatorEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	client.Send(&navigator.NavigatorPrefComposer{})
 	client.Send(&navigator.NavigatorMetaParserComposer{})
 	client.Send(&navigator.NavigatorRoomsComposer{})

@@ -13,7 +13,7 @@ func (c *PongComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *PongComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *PongComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(c.Id)
 	return compose
 }

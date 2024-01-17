@@ -7,7 +7,7 @@ import (
 type VersionCheckEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*VersionCheckEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (*VersionCheckEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	_ = in.ReadInt()    // clientId
 	_ = in.ReadString() // gordonPath
 	_ = in.ReadString() // externalVariables

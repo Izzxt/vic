@@ -13,6 +13,6 @@ func (c *SecureLoginOKComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (*SecureLoginOKComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (*SecureLoginOKComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	return compose
 }

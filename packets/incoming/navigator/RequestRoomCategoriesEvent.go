@@ -8,6 +8,6 @@ import (
 type RequestRoomCategoriesEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*RequestRoomCategoriesEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (*RequestRoomCategoriesEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	client.Send(&navigator.RoomCategoriesComposer{RoomCategory: client.Navigator().NavigatorFlatCats().GetCategories()})
 }

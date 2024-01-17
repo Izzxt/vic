@@ -10,7 +10,7 @@ import (
 type RequestUserDataEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *RequestUserDataEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *RequestUserDataEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	if client.GetHabbo() == nil {
 		fmt.Printf("Error: client.GetHabbo() == nil")
 	}

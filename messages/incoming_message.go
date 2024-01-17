@@ -82,7 +82,7 @@ func (in *incomingPacket) Readbyte() byte {
 	return value
 }
 
-func NewIncomingPacket(header int16, b []byte) core.IIncomingPacket {
+func NewIncomingPacket(header int16, b []byte) core.IncomingPacket {
 	data = b
 	return &incomingPacket{header, *bytes.NewReader(b)}
 }

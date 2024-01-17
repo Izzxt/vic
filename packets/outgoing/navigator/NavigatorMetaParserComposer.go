@@ -15,7 +15,7 @@ func (c *NavigatorMetaParserComposer) GetId() uint16 {
 var categories []string = []string{"official_view", "hotel_view", "roomads_view", "myworld_view"}
 
 // Compose implements core.IOutgoingMessage.
-func (c *NavigatorMetaParserComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NavigatorMetaParserComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(int32(len(categories)))
 	for _, category := range categories {
 		compose.WriteString(category)

@@ -11,7 +11,7 @@ func (i IgnoredUsersComposer) GetId() uint16 {
 	return outgoing.IgnoredUsersComposer
 }
 
-func (i IgnoredUsersComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (i IgnoredUsersComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(0)
 	return compose
 }

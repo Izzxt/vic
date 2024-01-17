@@ -11,7 +11,7 @@ func (r RightsComposer) GetId() uint16 {
 	return outgoing.RoomRightsComposer
 }
 
-func (r RightsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (r RightsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(r.Level)
 	return compose
 }

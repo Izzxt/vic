@@ -13,7 +13,7 @@ func (c *NavigatorCollapsedCategoriesComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *NavigatorCollapsedCategoriesComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NavigatorCollapsedCategoriesComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(0)
 	return compose
 }

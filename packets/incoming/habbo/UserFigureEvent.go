@@ -9,7 +9,7 @@ import (
 
 type UserFigureEvent struct{}
 
-func (u UserFigureEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (u UserFigureEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	fmt.Printf("\033[28mHabbo: %v\n", client.GetHabbo())
 	if client.GetHabbo() != nil {
 		return

@@ -8,7 +8,7 @@ import (
 type OpenComposer struct{}
 
 // Compose implements core.IOutgoingMessage.
-func (*OpenComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (*OpenComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	return compose
 }
 

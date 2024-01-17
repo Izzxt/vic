@@ -25,6 +25,6 @@ func (n *navigatorPublicCats) GetCategories() []navigator_public_cats.NavigatorP
 	return cats
 }
 
-func NewNavigatorPublicCats(ctx context.Context) core.INavigatorPublicCats {
+func NewNavigatorPublicCats(ctx context.Context) core.NavigatorPublicCats {
 	return &navigatorPublicCats{ctx: ctx}
 }

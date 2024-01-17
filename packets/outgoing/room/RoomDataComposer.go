@@ -13,7 +13,7 @@ type RoomDataComposer struct {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *RoomDataComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *RoomDataComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	fmt.Println("RoomDataComposer", c.Enter, c.Forward)
 	compose.WriteBool(c.Enter)  // isLoading
 	compose.WriteInt(1)         // Room id

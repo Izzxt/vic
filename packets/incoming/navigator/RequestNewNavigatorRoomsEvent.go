@@ -10,7 +10,7 @@ import (
 type RequestNewNavigatorRoomsEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *RequestNewNavigatorRoomsEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *RequestNewNavigatorRoomsEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	// if client.GetHabbo() != nil {
 	// return
 	//

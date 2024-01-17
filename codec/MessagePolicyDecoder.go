@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/Izzxt/vic/core"
+	"github.com/gorilla/websocket"
 )
 
 var XmlPolicy = []byte("<?xml version=\"1.0\"?>\r\n" +
@@ -13,7 +14,7 @@ var XmlPolicy = []byte("<?xml version=\"1.0\"?>\r\n" +
 	"<allow-access-from domain=\"*\" to-ports=\"1-31111\" />\r\n" +
 	"</cross-domain-policy>\x00")
 
-func SendPolicy(buf bytes.Buffer, client core.IHabboClient) {
+func SendPolicy(buf bytes.Buffer, client core.HabboClient) {
 	// var hasReceivedPolicy = false
 	b, err := buf.ReadByte()
 	if err != nil {
@@ -21,7 +22,7 @@ func SendPolicy(buf bytes.Buffer, client core.IHabboClient) {
 	}
 	if b == '<' {
 		// hasReceivedPolicy = true
-		err := client.GetSocket().Write(XmlPolicy)
+		err := client.Connection().WriteMessage(websocket.BinaryMessage, XmlPolicy)
 		if err != nil {
 			log.Fatalf("failed to write xml policy: %v", err)
 		}

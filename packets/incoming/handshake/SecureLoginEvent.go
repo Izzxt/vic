@@ -8,7 +8,7 @@ import (
 type SecureLoginEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *SecureLoginEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *SecureLoginEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	ssoTicket := in.ReadString()
 	if ssoTicket == "" {
 		return

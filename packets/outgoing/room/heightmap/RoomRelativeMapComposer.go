@@ -6,14 +6,14 @@ import (
 )
 
 type MapComposer struct {
-	Room core.IRoom
+	Room core.Room
 }
 
 func (r MapComposer) GetId() uint16 {
 	return outgoing.RelativeMapComposer
 }
 
-func (r MapComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (r MapComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(int32(r.Room.TileMap().GetCount() / r.Room.TileMap().GetLength()))
 	compose.WriteInt(int32(r.Room.TileMap().GetCount()))
 

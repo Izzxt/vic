@@ -6,11 +6,11 @@ import (
 )
 
 type ModelComposer struct {
-	Room core.IRoom
+	Room core.Room
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *ModelComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *ModelComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteString(c.Room.Model().GetName())
 	compose.WriteInt(c.Room.Info().GetId())
 	return compose

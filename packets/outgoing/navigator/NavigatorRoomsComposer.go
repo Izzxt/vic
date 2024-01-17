@@ -13,7 +13,7 @@ func (c *NavigatorRoomsComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *NavigatorRoomsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NavigatorRoomsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(0)
 	// compose.WriteInt(1)
 	// compose.WriteInt(0)

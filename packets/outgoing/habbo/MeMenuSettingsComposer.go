@@ -11,7 +11,7 @@ func (m MeMenuSettingsComposer) GetId() uint16 {
 	return outgoing.MeMenuSettingsComposer
 }
 
-func (m MeMenuSettingsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (m MeMenuSettingsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(1)      // volume_system
 	compose.WriteInt(1)      // volume_furni
 	compose.WriteInt(1)      // volume_trax

@@ -13,6 +13,6 @@ func (c *PingComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (*PingComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (*PingComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	return compose
 }

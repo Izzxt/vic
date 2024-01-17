@@ -7,19 +7,19 @@ import (
 )
 
 type navigatorManager struct {
-	navigatorFlatCats   core.INavigatorFlatCats
-	navigatorPublicCats core.INavigatorPublicCats
+	navigatorFlatCats   core.NavigatorFlatCats
+	navigatorPublicCats core.NavigatorPublicCats
 }
 
-func (nm *navigatorManager) NavigatorFlatCats() core.INavigatorFlatCats {
+func (nm *navigatorManager) NavigatorFlatCats() core.NavigatorFlatCats {
 	return nm.navigatorFlatCats
 }
 
-func (nm navigatorManager) NavigatorPublicCats() core.INavigatorPublicCats {
+func (nm navigatorManager) NavigatorPublicCats() core.NavigatorPublicCats {
 	return nm.navigatorPublicCats
 }
 
-func NewNavigatorManager(ctx context.Context) core.INavigatorManager {
+func NewNavigatorManager(ctx context.Context) core.NavigatorManager {
 	navigatorFlatCats := NewNavigatorFlatCats(ctx)
 	navigatorPublicCats := NewNavigatorPublicCats(ctx)
 	return &navigatorManager{

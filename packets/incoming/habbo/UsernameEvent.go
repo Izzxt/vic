@@ -7,6 +7,6 @@ import (
 
 type UsernameEvent struct{}
 
-func (u UsernameEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (u UsernameEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	client.Send(&unknown.IgnoredUsersComposer{})
 }

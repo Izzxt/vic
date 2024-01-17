@@ -202,7 +202,7 @@ func parse(input byte) int {
 	return strings.IndexByte(c, input)
 }
 
-func NewRoomTileMap(room core.IRoom, model core.IRoomModel) core.IRoomTileMap {
+func NewRoomTileMap(room core.Room, model core.IRoomModel) core.IRoomTileMap {
 	tileMap := new(RoomTileMap)
 
 	heightmap := strings.Split(model.GetHeightmap(), "\r\n")

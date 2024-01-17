@@ -8,6 +8,6 @@ import (
 type RequestUserCreditsEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *RequestUserCreditsEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *RequestUserCreditsEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	client.Send(&habbo.UserCreditsComposer{Habbo: nil})
 }

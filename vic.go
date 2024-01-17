@@ -11,19 +11,20 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
+	"github.com/Izzxt/vic/messages"
 	"github.com/Izzxt/vic/networking"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type Vic struct {
-	Navigator core.INavigatorManager
-	Room      core.IRoomManager
+	Navigator core.NavigatorManager
+	Room      core.RoomManager
 }
 
 var (
-	room      core.IRoomManager
-	navigator core.INavigatorManager
-	net       networking.Networking
+	room      core.RoomManager
+	navigator core.NavigatorManager
+	net       core.Networking
 )
 
 func (v *Vic) Init() {
@@ -40,7 +41,10 @@ func (v *Vic) Init() {
 	host := ""
 	port := 2097
 
-	net = networking.NewNetworking(context.Background(), host, port, navigator, room)
+	m := messages.NewMessages()
+	m.RegisterMessages()
+
+	net = networking.NewNetworking(context.Background(), host, port, m, navigator, room)
 	if err := net.StartWS(); err != nil {
 		fmt.Printf("Error starting websocket: %v", err)
 	}

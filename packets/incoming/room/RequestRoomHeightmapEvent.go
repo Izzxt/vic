@@ -7,7 +7,7 @@ import (
 
 type RequestRoomHeightmapEvent struct{}
 
-func (e RequestRoomHeightmapEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e RequestRoomHeightmapEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	if client.GetHabbo() == nil {
 		return
 	}

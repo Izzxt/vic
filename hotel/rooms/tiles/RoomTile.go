@@ -6,19 +6,19 @@ type RoomTile struct {
 	x, y         int32
 	height       float32
 	state        core.RoomTileState
-	habboOnTiles []core.IHabboRoomUnit
+	habboOnTiles []core.HabboRoomUnit
 }
 
 // GetHabboRoomUnit implements core.IRoomTile.
-func (r *RoomTile) HabboOnTiles() []core.IHabboRoomUnit {
+func (r *RoomTile) HabboOnTiles() []core.HabboRoomUnit {
 	return r.habboOnTiles
 }
 
-func (r *RoomTile) AddHabboRoomUnit(h core.IHabboRoomUnit) {
+func (r *RoomTile) AddHabboRoomUnit(h core.HabboRoomUnit) {
 	r.habboOnTiles = append(r.habboOnTiles, h)
 }
 
-func (r *RoomTile) RemoveHabboRoomUnit(h core.IHabboRoomUnit) {
+func (r *RoomTile) RemoveHabboRoomUnit(h core.HabboRoomUnit) {
 	for i, habbo := range r.habboOnTiles {
 		if habbo == h {
 			r.habboOnTiles = append(r.habboOnTiles[:i], r.habboOnTiles[i+1:]...)

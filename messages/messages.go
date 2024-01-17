@@ -1,27 +1,24 @@
 package messages
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/packets/incoming"
 	"github.com/Izzxt/vic/packets/incoming/habbo"
 	"github.com/Izzxt/vic/packets/incoming/handshake"
-	"github.com/Izzxt/vic/packets/incoming/hotelview"
 	"github.com/Izzxt/vic/packets/incoming/navigator"
 	"github.com/Izzxt/vic/packets/incoming/room"
 	room_units "github.com/Izzxt/vic/packets/incoming/room/units"
-	"github.com/Izzxt/vic/packets/incoming/tracking"
 )
 
 type messages struct {
 	mutex              *sync.Mutex
-	handleMessageMutex *sync.Mutex
+	handleMessageMutex *sync.RWMutex
 }
 
 var (
-	incomingMessages = make(map[int16]core.IIncomingMessage)
+	incomingMessages = make(map[int16]core.IncomingMessage)
 )
 
 // RegisterMessages implements core.IMessages.
@@ -48,43 +45,43 @@ func (m *messages) RegisterMessages() {
 	m.RegisterIncomingMessage(incoming.RequestRoomCategoriesEvent, &navigator.RequestRoomCategoriesEvent{})
 
 	// Tracking
-	m.RegisterIncomingMessage(incoming.EventTrackerEvent, &tracking.EventTrackerEvent{}) // 4000
+	// m.RegisterIncomingMessage(incoming.EventTrackerEvent, &tracking.EventTrackerEvent{}) // 4000
 
 	// Hotel view
-	m.RegisterIncomingMessage(incoming.RequestHotelViewBonusRareEvent, &hotelview.RequestHotelViewBonusRareEvent{}) // 957
-	m.RegisterIncomingMessage(incoming.HotelViewDataEvent, &hotelview.HotelViewDataEvent{})                         // 2912
+	// m.RegisterIncomingMessage(incoming.RequestHotelViewBonusRareEvent, &hotelview.RequestHotelViewBonusRareEvent{}) // 957
+	// m.RegisterIncomingMessage(incoming.HotelViewDataEvent, &hotelview.HotelViewDataEvent{})                         // 2912
 
-	// // Friends
+	// Friends
 	// m.RegisterIncomingMessage(incoming.RequestFriendsEvent, &friends.RequestFriendsEvent{})
 	// m.RegisterIncomingMessage(incoming.RequestInitFriendsEvent, &friends.RequestInitFriendsEvent{})
 
-	// // Room
+	// Room
 	m.RegisterIncomingMessage(incoming.RequestRoomDataEvent, &room.RequestRoomDataEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomLoadEvent, &room.RequestRoomLoadEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomHeightmapEvent, &room.RequestRoomHeightmapEvent{})
 
-	// // Room unit
+	// Room unit
 	m.RegisterIncomingMessage(incoming.RoomUnitWalkEvent, &room_units.RoomUnitWalkEvent{})
 }
 
 // HandleMessages implements core.IMessages.
-func (m *messages) HandleMessages(client core.IHabboClient, packet core.IIncomingPacket) {
-	// m.handleMessageMutex.Lock()
-	// defer m.handleMessageMutex.Unlock()
+func (m *messages) HandleMessages(client core.HabboClient, packet core.IncomingPacket) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	if message, ok := incomingMessages[packet.GetHeader()]; ok {
 		message.Execute(client, packet)
 	} else {
-		fmt.Printf("Message %d not handled\n", packet.GetHeader())
+		// fmt.Printf("Message %d not handled\n", packet.GetHeader())
 	}
 }
 
 // RegisterIncomingMessage implements core.IMessages.
-func (m *messages) RegisterIncomingMessage(id int16, in core.IIncomingMessage) {
+func (m *messages) RegisterIncomingMessage(id int16, in core.IncomingMessage) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	incomingMessages[id] = in
 }
 
-func NewMessages() core.IMessages {
-	return &messages{mutex: &sync.Mutex{}, handleMessageMutex: &sync.Mutex{}}
+func NewMessages() core.Messages {
+	return &messages{mutex: &sync.Mutex{}, handleMessageMutex: &sync.RWMutex{}}
 }

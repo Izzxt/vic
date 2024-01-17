@@ -7,6 +7,6 @@ import (
 type PongEvent struct{ s int }
 
 // Execute implements core.IIncomingMessage.
-func (e *PongEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *PongEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	e.s = 0
 }

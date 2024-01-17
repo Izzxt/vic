@@ -5,7 +5,7 @@ import (
 	"github.com/Izzxt/vic/packets/outgoing"
 )
 
-type UserDataComposer struct{ Habbo core.IHabbo }
+type UserDataComposer struct{ Habbo core.Habbo }
 
 // GetId implements core.IOutgoingMessage.
 func (c *UserDataComposer) GetId() uint16 {
@@ -13,7 +13,7 @@ func (c *UserDataComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *UserDataComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *UserDataComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(c.Habbo.HabboInfo().ID)
 	compose.WriteString(c.Habbo.HabboInfo().Username)
 	compose.WriteString(c.Habbo.HabboInfo().Look)

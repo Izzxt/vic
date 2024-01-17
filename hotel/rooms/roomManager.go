@@ -8,15 +8,15 @@ import (
 
 type RoomManager struct {
 	ctx  context.Context
-	room core.IRoom
+	room core.Room
 }
 
 var (
-	rooms = make(map[int32]core.IRoom)
+	rooms = make(map[int32]core.Room)
 )
 
 // Room implements core.IRoomManager.
-func (r *RoomManager) GetRoom(id int32) core.IRoom {
+func (r *RoomManager) GetRoom(id int32) core.Room {
 	if room, ok := rooms[id]; ok {
 		return room
 	}
@@ -31,7 +31,7 @@ func (r *RoomManager) GetRoom(id int32) core.IRoom {
 	return room
 }
 
-func NewRoomManager(ctx context.Context) core.IRoomManager {
+func NewRoomManager(ctx context.Context) core.RoomManager {
 	roomManager := RoomManager{}
 	roomManager.ctx = ctx
 	return &roomManager

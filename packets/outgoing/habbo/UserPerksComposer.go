@@ -8,7 +8,7 @@ import (
 type UserPerksComposer struct{}
 
 // Compose implements core.IOutgoingMessage.
-func (*UserPerksComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (*UserPerksComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(15) // Count
 	compose.WriteString("USE_GUIDE_TOOL")
 	compose.WriteString("requirement.unfulfilled.helper_level_4") // Not required for Nitro ?

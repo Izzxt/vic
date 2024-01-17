@@ -3,134 +3,142 @@ package habboclient
 import (
 	"context"
 	"log"
-	"sync"
 
 	"github.com/Izzxt/vic/codec"
 	"github.com/Izzxt/vic/core"
-	"github.com/Izzxt/vic/hotel/habbo"
 	"github.com/Izzxt/vic/messages"
 	"github.com/gorilla/websocket"
 )
 
-var (
-	connectedClients = make(map[core.IHabbo]core.IHabboClient)
-	clientSocket     = make(map[*websocket.Conn]core.IHabbo)
-	// habbo            core.IHabbo = nil
-)
-
 type habboClient struct {
-	ctx         context.Context
-	socket      core.ISocket
-	clientMutex *sync.Mutex
-	cmu         *sync.Mutex
-	navigator   core.INavigatorManager
-	room        core.IRoomManager
-	conn        *websocket.Conn
-	habbo       core.IHabbo
+	ctx        context.Context
+	conn       *websocket.Conn
+	outgoing   chan core.OutgoingMessage
+	done       chan struct{}
+	networking core.Networking
+	clients    map[*websocket.Conn]core.HabboClient
+	messages   core.Messages
+	habbo      core.Habbo
+
+	navigator core.NavigatorManager
+	room      core.RoomManager
 }
 
-// SetConnection implements core.IHabboClient.
-func (h *habboClient) SetConnection(ws *websocket.Conn) {
-	h.conn = ws
-}
-
-// Navigator implements core.IHabboClient.
-func (h *habboClient) Navigator() core.INavigatorManager {
+// Navigator implements core.HabboClient.
+func (h *habboClient) Navigator() core.NavigatorManager {
 	return h.navigator
 }
 
-func (h *habboClient) Room() core.IRoomManager {
+// Room implements core.HabboClient.
+func (h *habboClient) Room() core.RoomManager {
 	return h.room
 }
 
-// GetContext implements core.IHabboClient.
+// SetNavigator implements core.HabboClient.
+func (h *habboClient) SetNavigator(m core.NavigatorManager) {
+	h.navigator = m
+}
+
+// SetRoom implements core.HabboClient.
+func (h *habboClient) SetRoom(m core.RoomManager) {
+	h.room = m
+}
+
+// GetHabbo implements core.HabboClient.
+func (h *habboClient) GetHabbo() core.Habbo {
+	return h.habbo
+}
+
+// SetHabbo implements core.HabboClient.
+func (h *habboClient) SetHabbo(habbo core.Habbo) {
+	h.habbo = habbo
+}
+
+// SendToHabbos implements core.HabboClient.
+func (h *habboClient) SendToHabbos(habbos []core.Habbo, out core.OutgoingMessage) {
+	for _, habbo := range habbos {
+		habbo.Client().Send(out)
+	}
+}
+
+// SendToRoom implements core.HabboClient.
+func (h *habboClient) SendToRoom(room core.Room, out core.OutgoingMessage) {
+	h.SendToHabbos(room.GetHabbos(), out)
+}
+
+// AddClient implements core.HabboClient.
+func (h *habboClient) AddClient(conn *websocket.Conn) {
+	h.clients[conn] = h
+}
+
+// GetContext implements core.HabboClient.
 func (h *habboClient) GetContext() context.Context {
 	return h.ctx
 }
 
-// SetHabbo implements core.IHabboClient.
-func (c *habboClient) SetHabbo(h core.IHabbo) {
-	// c.clientMutex.Lock()
-	// defer c.clientMutex.Unlock()
-	habbo.Habbos[c.conn] = h
+// Listen implements core.HabboClient.
+func (h *habboClient) Listen() {
+	go h.writeMessage()
+	h.readMessage()
 }
 
-// Connection implements core.IHabboClient.
+// Send implements core.HabboClient.
+func (h *habboClient) Send(out core.OutgoingMessage) {
+	h.outgoing <- out
+}
+
+func (h *habboClient) readMessage() {
+	for {
+		select {
+		case <-h.done:
+			h.done <- struct{}{}
+			return
+		default:
+			_, msg, err := h.conn.ReadMessage()
+			if err != nil {
+				h.done <- struct{}{}
+				return
+			}
+
+			data, _, header := codec.Decode(msg, h)
+			incomingPacket := messages.NewIncomingPacket(header, data)
+			h.messages.HandleMessages(h, incomingPacket)
+		}
+	}
+}
+
+func (h *habboClient) writeMessage() {
+	for {
+		select {
+		case <-h.done:
+			h.done <- struct{}{}
+			return
+		case out := <-h.outgoing:
+			bytes := make([]byte, 6)
+			outgoingPacket := messages.NewOutgoingPacket(out.GetId(), bytes)
+			compose := out.Compose(outgoingPacket)
+			bytes = codec.Encode(outgoingPacket.GetHeader(), compose.GetBytes())
+			err := h.conn.WriteMessage(websocket.BinaryMessage, bytes)
+			if err != nil {
+				log.Fatalf("Error sending packet: %v", err)
+			}
+		}
+	}
+}
+
+// Connection implements core.HabboClient.
 func (h *habboClient) Connection() *websocket.Conn {
 	return h.conn
 }
 
-// AddClient implements core.IHabboClient.
-func (h *habboClient) AddClient(habbo core.IHabbo) {
-	h.clientMutex.Lock()
-	defer h.clientMutex.Unlock()
-	connectedClients[habbo] = h
-	clientSocket[h.conn] = habbo
-}
-
-func (h *habboClient) GetHabbo() core.IHabbo {
-	// h.clientMutex.Lock()
-	// defer h.clientMutex.Unlock()
-	if habbo, ok := habbo.Habbos[h.conn]; ok {
-		return habbo
+func NewHabboClient(ctx context.Context, conn *websocket.Conn, messages core.Messages, networking core.Networking) core.HabboClient {
+	if conn == nil {
+		panic("conn cannot be nil")
 	}
-	return nil
-}
 
-// GetSocket implements core.IHabboClient.
-func (h *habboClient) GetSocket() core.ISocket {
-	return h.socket
-}
+	outgoing := make(chan core.OutgoingMessage)
+	done := make(chan struct{})
+	clients := make(map[*websocket.Conn]core.HabboClient)
 
-// ReadMessage implements core.IHabboClient.
-func (h *habboClient) ReadMessage() {
-}
-
-// RemoveClient implements core.IHabboClient.
-func (h *habboClient) RemoveClient(habbo core.IHabbo) {
-	h.clientMutex.Lock()
-	defer h.clientMutex.Unlock()
-	delete(connectedClients, habbo)
-}
-
-// Send implements core.IHabboClient.
-func (h *habboClient) Send(out core.IOutgoingMessage) error {
-	h.cmu.Lock()
-	defer h.cmu.Unlock()
-	bytes := make([]byte, 6)
-	outgoingPacket := messages.NewOutgoingPacket(out.GetId(), bytes)
-	compose := out.Compose(outgoingPacket)
-	bytes = codec.Encode(outgoingPacket.GetHeader(), compose.GetBytes())
-	err := h.conn.WriteMessage(websocket.BinaryMessage, bytes)
-	if err != nil {
-		log.Fatalf("Error sending packet: %v", err)
-	}
-	return nil
-}
-
-// SendToAll implements core.IHabboClient.
-func (h *habboClient) SendToAll(out core.IOutgoingMessage) {
-	for _, client := range connectedClients {
-		client.Send(out)
-	}
-}
-
-func (h *habboClient) SendToHabbos(habbos []core.IHabbo, out core.IOutgoingMessage) {
-	for _, habbo := range habbos {
-		client := habbo.(core.IHabbo).Client()
-		client.Send(out)
-	}
-}
-
-func (h *habboClient) SendToRoom(room core.IRoom, out core.IOutgoingMessage) {
-	h.SendToHabbos(room.GetHabbos(), out)
-}
-
-// SetSocket implements core.IHabboClient.
-func (h *habboClient) SetSocket(socket core.ISocket) {
-	h.socket = socket
-}
-
-func NewHabboClient(ctx context.Context, conn *websocket.Conn, navigator core.INavigatorManager, room core.IRoomManager) core.IHabboClient {
-	return &habboClient{ctx: ctx, clientMutex: &sync.Mutex{}, conn: conn, cmu: &sync.Mutex{}, navigator: navigator, room: room}
+	return &habboClient{ctx: ctx, conn: conn, outgoing: outgoing, done: done, messages: messages, networking: networking, clients: clients}
 }

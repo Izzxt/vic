@@ -8,14 +8,14 @@ import (
 )
 
 type HeightMapComposer struct {
-	Room core.IRoom
+	Room core.Room
 }
 
 func (r HeightMapComposer) GetId() uint16 {
 	return outgoing.HeightMapComposer
 }
 
-func (r HeightMapComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (r HeightMapComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteBool(true)
 	compose.WriteInt(r.Room.Info().GetWallHeight())                                      // fixed wall height
 	compose.WriteString(strings.ReplaceAll(r.Room.Model().GetHeightmap(), "\r\n", "\r")) // relative Room

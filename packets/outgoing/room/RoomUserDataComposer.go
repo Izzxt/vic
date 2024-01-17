@@ -11,7 +11,7 @@ func (u UserDataComposer) GetId() uint16 {
 	return outgoing.RoomUserDataComposer
 }
 
-func (u UserDataComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (u UserDataComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	// room unit id
 	compose.WriteInt(1)
 	// user look

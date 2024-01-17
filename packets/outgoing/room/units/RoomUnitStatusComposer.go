@@ -10,21 +10,21 @@ import (
 )
 
 type RoomUnitStatusComposer struct {
-	Habbos    []core.IHabbo
-	RoomUnits list.List[core.IHabboRoomUnit]
+	Habbos    []core.Habbo
+	RoomUnits list.List[core.HabboRoomUnit]
 }
 
-func NewRoomUnitStatusWithHabbosComposer(habbos []core.IHabbo) *RoomUnitStatusComposer {
+func NewRoomUnitStatusWithHabbosComposer(habbos []core.Habbo) *RoomUnitStatusComposer {
 	return &RoomUnitStatusComposer{Habbos: habbos, RoomUnits: nil}
 }
 
-func NewRoomUnitStatusWithRoomsComposer(roomUnits core.IHabboRoomUnit) *RoomUnitStatusComposer {
-	roomUnit := &RoomUnitStatusComposer{RoomUnits: list.New[core.IHabboRoomUnit](0)}
+func NewRoomUnitStatusWithRoomsComposer(roomUnits core.HabboRoomUnit) *RoomUnitStatusComposer {
+	roomUnit := &RoomUnitStatusComposer{RoomUnits: list.New[core.HabboRoomUnit](0)}
 	roomUnit.RoomUnits.Add(roomUnits)
 	return roomUnit
 }
 
-func (c *RoomUnitStatusComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *RoomUnitStatusComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	if c.RoomUnits != nil {
 		compose.WriteInt(int32(c.RoomUnits.Len()))
 		for _, room := range c.RoomUnits.Values() {
@@ -54,7 +54,7 @@ func (c *RoomUnitStatusComposer) Compose(compose core.IOutgoingPacket) core.IOut
 	} else if c.Habbos != nil {
 		compose.WriteInt(int32(len(c.Habbos)))
 		for _, habbo := range c.Habbos {
-			habbo := habbo.(core.IHabbo)
+			habbo := habbo.(core.Habbo)
 			compose.WriteInt(habbo.RoomUnit().ID())
 
 			compose.WriteInt(habbo.RoomUnit().PreviousTile().GetX())

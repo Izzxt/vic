@@ -8,7 +8,7 @@ import (
 type RequestRoomDataEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *RequestRoomDataEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *RequestRoomDataEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	// roomId := in.ReadInt()
 	// forward := in.ReadBool()
 	enter := in.ReadBool()

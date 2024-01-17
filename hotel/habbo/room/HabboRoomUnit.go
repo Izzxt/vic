@@ -14,8 +14,8 @@ import (
 
 type habboRoomUnit struct {
 	id    int32
-	habbo core.IHabbo
-	room  core.IRoom
+	habbo core.Habbo
+	room  core.Room
 
 	currentTile  core.IRoomTile
 	previousTile core.IRoomTile
@@ -27,6 +27,10 @@ type habboRoomUnit struct {
 	statusMutex  sync.Mutex
 	t            *time.Timer
 	ticker       *time.Ticker
+
+	goalTileMutex    sync.Mutex
+	goalPathMutex    sync.Mutex
+	currentTileMutex sync.Mutex
 }
 
 // p	panic("unimplemented")tatuses implements core.IHabboRoomUnit.
@@ -47,12 +51,14 @@ func (h *habboRoomUnit) SetPreviousTile(tile core.IRoomTile) {
 }
 
 // WalkTo implements core.IHabboRoomUnit.
-func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile, client core.IHabboClient) {
+func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile, client core.HabboClient) {
 	if h.room == nil {
 		return
 	}
 
+	h.goalTileMutex.Lock()
 	h.goalTile = tile
+	h.goalTileMutex.Unlock()
 
 	if h.ticker == nil {
 		ctx, cancel := context.WithCancel(ctx)
@@ -98,6 +104,7 @@ func (h *habboRoomUnit) stopWalking(cancel context.CancelFunc) {
 	h.SetPreviousTile(h.currentTile)
 
 	delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
+
 	h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(h.Room().GetHabbos()))
 
 	h.ticker.Stop()
@@ -112,11 +119,11 @@ func (h *habboRoomUnit) ID() int32 {
 	return h.id
 }
 
-func (h *habboRoomUnit) Habbo() core.IHabbo {
+func (h *habboRoomUnit) Habbo() core.Habbo {
 	return h.habbo
 }
 
-func (h *habboRoomUnit) Room() core.IRoom {
+func (h *habboRoomUnit) Room() core.Room {
 	return h.room
 }
 
@@ -144,11 +151,11 @@ func (h *habboRoomUnit) SetBodyRotation(rotation core.RoomTileDirection) {
 	h.bodyRotation = rotation
 }
 
-func (h *habboRoomUnit) SetRoom(room core.IRoom) {
+func (h *habboRoomUnit) SetRoom(room core.Room) {
 	h.room = room
 }
 
-func (h *habboRoomUnit) SetHabbo(habbo core.IHabbo) {
+func (h *habboRoomUnit) SetHabbo(habbo core.Habbo) {
 	h.habbo = habbo
 }
 
@@ -158,7 +165,7 @@ func (h *habboRoomUnit) Dispose() {
 	h.currentTile = nil
 }
 
-func NewHabboRoomUnit(id int32, habbo core.IHabbo, room core.IRoom, currentTile core.IRoomTile, bodyRotation core.RoomTileDirection) core.IHabboRoomUnit {
+func NewHabboRoomUnit(id int32, habbo core.Habbo, room core.Room, currentTile core.IRoomTile, bodyRotation core.RoomTileDirection) core.HabboRoomUnit {
 	habboRoomUnit := new(habboRoomUnit)
 	habboRoomUnit.id = id
 	habboRoomUnit.habbo = habbo

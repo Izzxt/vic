@@ -11,7 +11,7 @@ type HotelViewDataComposer struct {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *HotelViewDataComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *HotelViewDataComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteString(c.Data)
 	compose.WriteString(c.Key)
 	return compose

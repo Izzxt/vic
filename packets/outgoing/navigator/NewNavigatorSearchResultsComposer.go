@@ -17,7 +17,7 @@ type NewNavigatorSearchResultsComposer struct {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *NewNavigatorSearchResultsComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NewNavigatorSearchResultsComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteString(c.SearchCode)
 	compose.WriteString(c.SearchQuery)
 	compose.WriteInt(int32(len(c.NavigatorSearchResults)))
@@ -35,7 +35,7 @@ func (c *NewNavigatorSearchResultsComposer) Compose(compose core.IOutgoingPacket
 }
 
 // TODO: move to room.go
-func room(compose core.IOutgoingPacket) {
+func room(compose core.OutgoingPacket) {
 	var isPublic bool = false
 	var tags []string
 	compose.WriteInt(1)         // room id

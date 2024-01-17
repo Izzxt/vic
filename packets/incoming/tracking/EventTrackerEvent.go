@@ -7,4 +7,4 @@ import (
 type EventTrackerEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*EventTrackerEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {}
+func (*EventTrackerEvent) Execute(client core.HabboClient, in core.IncomingPacket) {}

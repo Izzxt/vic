@@ -19,7 +19,7 @@ func (c *NoobnessLevelComposer) GetId() uint16 {
 	return outgoing.NoobnessLevelComposer
 }
 
-func (c *NoobnessLevelComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NoobnessLevelComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(int32(core.NoobnessLevel(c.Level)))
 	return compose
 }

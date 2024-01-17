@@ -8,11 +8,11 @@ import (
 )
 
 type RoomUnitComposer struct {
-	Habbos []core.IHabbo
+	Habbos []core.Habbo
 }
 
 // TODO: implement this
-func (c *RoomUnitComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *RoomUnitComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(int32(len(c.Habbos)))
 
 	for _, habbo := range c.Habbos {

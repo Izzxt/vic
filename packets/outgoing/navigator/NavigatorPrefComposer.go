@@ -13,7 +13,7 @@ func (c *NavigatorPrefComposer) GetId() uint16 {
 }
 
 // Compose implements core.IOutgoingMessage.
-func (c *NavigatorPrefComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (c *NavigatorPrefComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	compose.WriteInt(68)     //X
 	compose.WriteInt(42)     //Y
 	compose.WriteInt(425)    //Width

@@ -7,4 +7,4 @@ import (
 type RequestInitFriendsEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (*RequestInitFriendsEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {}
+func (*RequestInitFriendsEvent) Execute(client core.HabboClient, in core.IncomingPacket) {}

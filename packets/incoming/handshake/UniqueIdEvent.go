@@ -8,7 +8,7 @@ import (
 type UniqueIdEvent struct{}
 
 // Execute implements core.IIncomingMessage.
-func (e *UniqueIdEvent) Execute(client core.IHabboClient, in core.IIncomingPacket) {
+func (e *UniqueIdEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
 	// log := e.Log
 	in.ReadString()
 	machineId := in.ReadString()

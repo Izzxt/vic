@@ -10,7 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	vic := &vic.Vic{}
+	vic := vic.Vic{}
 
 	vic.Navigator = navigator.NewNavigatorManager(ctx)
 	vic.Room = rooms.NewRoomManager(ctx)

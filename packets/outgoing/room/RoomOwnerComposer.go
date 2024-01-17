@@ -11,6 +11,6 @@ func (r OwnerComposer) GetId() uint16 {
 	return outgoing.RoomOwnerComposer
 }
 
-func (r OwnerComposer) Compose(compose core.IOutgoingPacket) core.IOutgoingPacket {
+func (r OwnerComposer) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
 	return compose
 }
