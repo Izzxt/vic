@@ -12,13 +12,13 @@ import (
 
 func TestRoomTileMap_PathFinder(t *testing.T) {
 	type args struct {
-		start core.IRoomTile
-		goal  core.IRoomTile
+		start core.RoomTile
+		goal  core.RoomTile
 	}
 	tests := []struct {
 		name string
 		args args
-		want []core.IRoomTile
+		want []core.RoomTile
 	}{
 		{
 			name: "test",

@@ -198,7 +198,7 @@ func (r *RoomInfo) GetWhoCanMute() int32 {
 	return r.WhoCanMute
 }
 
-func (r *RoomInfo) Load(id int32) core.IRoomInfo {
+func (r *RoomInfo) Load(id int32) core.RoomInfo {
 	db := database.GetInstance().RoomInfo()
 	room, err := db.GetRoomById(r.ctx, id)
 	if err != nil {
@@ -210,6 +210,6 @@ func (r *RoomInfo) Load(id int32) core.IRoomInfo {
 	return r
 }
 
-func NewRoomInfo(ctx context.Context) core.IRoomInfo {
+func NewRoomInfo(ctx context.Context) core.RoomInfo {
 	return &RoomInfo{ctx: ctx}
 }

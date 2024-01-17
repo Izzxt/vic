@@ -17,12 +17,12 @@ type habboRoomUnit struct {
 	habbo core.Habbo
 	room  core.Room
 
-	currentTile  core.IRoomTile
-	previousTile core.IRoomTile
+	currentTile  core.RoomTile
+	previousTile core.RoomTile
 	headRotation core.RoomTileDirection
 	bodyRotation core.RoomTileDirection
-	goalTile     core.IRoomTile
-	goalPath     list.List[core.IRoomTile]
+	goalTile     core.RoomTile
+	goalPath     list.List[core.RoomTile]
 	statuses     map[core.HabboRoomUnitStatus]string
 	statusMutex  sync.Mutex
 	t            *time.Timer
@@ -41,17 +41,17 @@ func (h *habboRoomUnit) Statuses() map[core.HabboRoomUnitStatus]string {
 }
 
 // PreviousTile implements core.IHabboRoomUnit.
-func (h *habboRoomUnit) PreviousTile() core.IRoomTile {
+func (h *habboRoomUnit) PreviousTile() core.RoomTile {
 	return h.previousTile
 }
 
 // SetPreviousTile implements core.IHabboRoomUnit.
-func (h *habboRoomUnit) SetPreviousTile(tile core.IRoomTile) {
+func (h *habboRoomUnit) SetPreviousTile(tile core.RoomTile) {
 	h.previousTile = tile
 }
 
 // WalkTo implements core.IHabboRoomUnit.
-func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.IRoomTile, client core.HabboClient) {
+func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.RoomTile, client core.HabboClient) {
 	if h.room == nil {
 		return
 	}
@@ -127,7 +127,7 @@ func (h *habboRoomUnit) Room() core.Room {
 	return h.room
 }
 
-func (h *habboRoomUnit) CurrentTile() core.IRoomTile {
+func (h *habboRoomUnit) CurrentTile() core.RoomTile {
 	return h.currentTile
 }
 
@@ -139,7 +139,7 @@ func (h *habboRoomUnit) BodyRotation() core.RoomTileDirection {
 	return h.bodyRotation
 }
 
-func (h *habboRoomUnit) SetCurrentTile(tile core.IRoomTile) {
+func (h *habboRoomUnit) SetCurrentTile(tile core.RoomTile) {
 	h.currentTile = tile
 }
 
@@ -165,7 +165,7 @@ func (h *habboRoomUnit) Dispose() {
 	h.currentTile = nil
 }
 
-func NewHabboRoomUnit(id int32, habbo core.Habbo, room core.Room, currentTile core.IRoomTile, bodyRotation core.RoomTileDirection) core.HabboRoomUnit {
+func NewHabboRoomUnit(id int32, habbo core.Habbo, room core.Room, currentTile core.RoomTile, bodyRotation core.RoomTileDirection) core.HabboRoomUnit {
 	habboRoomUnit := new(habboRoomUnit)
 	habboRoomUnit.id = id
 	habboRoomUnit.habbo = habbo

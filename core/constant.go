@@ -1,5 +1,7 @@
 package core
 
+type HabboRoomUnitStatus string
+
 const (
 	HabboRoomUnitStatusMove HabboRoomUnitStatus = "mv"
 

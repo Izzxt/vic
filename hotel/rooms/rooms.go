@@ -16,9 +16,9 @@ var (
 )
 
 type Room struct {
-	model   core.IRoomModel
-	info    core.IRoomInfo
-	tileMap core.IRoomTileMap
+	model   core.RoomModel
+	info    core.RoomInfo
+	tileMap core.RoomTileMap
 	habbos  []core.Habbo
 }
 
@@ -28,12 +28,12 @@ func (r *Room) GetHabbos() []core.Habbo {
 }
 
 // TileMap implements core.IRoom.
-func (r *Room) TileMap() core.IRoomTileMap {
+func (r *Room) TileMap() core.RoomTileMap {
 	return r.tileMap
 }
 
 // SetModel implements core.IRoom.
-func (r *Room) SetModel(model core.IRoomModel) {
+func (r *Room) SetModel(model core.RoomModel) {
 	r.model = model
 }
 
@@ -120,16 +120,16 @@ func (r *Room) LoadRoom() {
 }
 
 // Model implements core.IRoom.
-func (r *Room) Model() core.IRoomModel {
+func (r *Room) Model() core.RoomModel {
 	return r.model
 }
 
 // Info implements core.IRoom.
-func (r *Room) Info() core.IRoomInfo {
+func (r *Room) Info() core.RoomInfo {
 	return r.info
 }
 
-func NewRoom(ctx context.Context, roomInfo core.IRoomInfo) core.Room {
+func NewRoom(ctx context.Context, roomInfo core.RoomInfo) core.Room {
 	room := Room{}
 	room.info = roomInfo
 	room.habbos = make([]core.Habbo, 0)

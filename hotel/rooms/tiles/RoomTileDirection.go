@@ -14,7 +14,7 @@ const (
 	DirectionLimit
 )
 
-func GetRoomTileDirection(f core.IRoomTile, t core.IRoomTile) core.RoomTileDirection {
+func GetRoomTileDirection(f core.RoomTile, t core.RoomTile) core.RoomTileDirection {
 	if f.GetX() == t.GetX() && f.GetY() > t.GetY() {
 		return DirectionNorth
 	} else if f.GetX() < t.GetX()+1 && f.GetY() > t.GetY() {

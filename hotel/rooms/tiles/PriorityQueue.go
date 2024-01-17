@@ -7,8 +7,8 @@ import (
 )
 
 type Item struct {
-	value    core.IRoomTile // The value of the item; arbitrary.
-	priority int            // The priority of the item in the queue.
+	value    core.RoomTile // The value of the item; arbitrary.
+	priority int           // The priority of the item in the queue.
 	// The index is needed by update and is maintained by the heap.Interface methods.
 	index int // The index of the item in the heap.
 }
@@ -72,7 +72,7 @@ func (pq *PriorityQueue) Remove(x any) {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (pq *PriorityQueue) update(item *Item, value core.IRoomTile, priority int) {
+func (pq *PriorityQueue) update(item *Item, value core.RoomTile, priority int) {
 	item.value = value
 	item.priority = priority
 	heap.Fix(pq, item.index)

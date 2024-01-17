@@ -53,7 +53,7 @@ func (r *RoomModels) GetY() int32 {
 	return r.RoomModel.Y
 }
 
-func (r *RoomModels) Load(id int32) core.IRoomModel {
+func (r *RoomModels) Load(id int32) core.RoomModel {
 	db := database.GetInstance().RoomModels()
 
 	model, err := db.GetModelById(r.ctx, id)
@@ -65,6 +65,6 @@ func (r *RoomModels) Load(id int32) core.IRoomModel {
 	return r
 }
 
-func NewRoomModels(ctx context.Context) core.IRoomModel {
+func NewRoomModels(ctx context.Context) core.RoomModel {
 	return &RoomModels{ctx: ctx}
 }

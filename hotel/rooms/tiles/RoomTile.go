@@ -46,6 +46,6 @@ func (r *RoomTile) GetY() int32 {
 	return r.y
 }
 
-func NewRoomTile(x int32, y int32, height float32, state core.RoomTileState) core.IRoomTile {
+func NewRoomTile(x int32, y int32, height float32, state core.RoomTileState) core.RoomTile {
 	return &RoomTile{x: x, y: y, height: height, state: state}
 }
