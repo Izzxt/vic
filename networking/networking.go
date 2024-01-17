@@ -11,11 +11,11 @@ import (
 )
 
 type networking struct {
-	ctx      context.Context
-	host     string
-	port     int
-	messages core.Messages
+	ctx  context.Context
+	host string
+	port int
 
+	messages  core.Messages
 	navigator core.NavigatorManager
 	room      core.RoomManager
 }
@@ -32,10 +32,9 @@ func (n *networking) StartWS() error {
 
 		client := habboclient.NewHabboClient(n.ctx, conn, n.messages, n)
 		client.AddClient(conn)
+
 		client.SetNavigator(n.navigator)
 		client.SetRoom(n.room)
-
-		fmt.Println("New client connected")
 
 		client.Listen()
 	}

@@ -3,6 +3,7 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
+	"sync"
 
 	"github.com/Izzxt/vic/core"
 )
@@ -12,10 +13,16 @@ type incomingPacket struct {
 	bytes  bytes.Reader
 }
 
-var data []byte
+var (
+	data []byte
+	dtMu sync.RWMutex = sync.RWMutex{}
+)
 
 // GetBytes implements packets.IIncomingPacket.
 func (in *incomingPacket) GetBytes() []byte {
+	dtMu.RLock()
+	defer dtMu.RUnlock()
+
 	return data
 }
 
@@ -83,6 +90,9 @@ func (in *incomingPacket) Readbyte() byte {
 }
 
 func NewIncomingPacket(header int16, b []byte) core.IncomingPacket {
+	dtMu.Lock()
 	data = b
+	dtMu.Unlock()
+
 	return &incomingPacket{header, *bytes.NewReader(b)}
 }

@@ -17,37 +17,54 @@ type habboRoomUnit struct {
 	habbo core.Habbo
 	room  core.Room
 
-	currentTile  core.RoomTile
-	previousTile core.RoomTile
-	headRotation core.RoomTileDirection
-	bodyRotation core.RoomTileDirection
-	goalTile     core.RoomTile
-	goalPath     list.List[core.RoomTile]
-	statuses     map[core.HabboRoomUnitStatus]string
-	statusMutex  sync.Mutex
-	t            *time.Timer
-	ticker       *time.Ticker
+	mu sync.RWMutex
 
-	goalTileMutex    sync.Mutex
-	goalPathMutex    sync.Mutex
-	currentTileMutex sync.Mutex
+	currentTile core.RoomTile
+	ctMu        sync.RWMutex
+
+	previousTile core.RoomTile
+	ptMu         sync.RWMutex
+
+	headRotation core.RoomTileDirection
+	hrMu         sync.RWMutex
+
+	bodyRotation core.RoomTileDirection
+	brMu         sync.RWMutex
+
+	goalTile core.RoomTile
+	gtMu     sync.RWMutex
+
+	goalPath list.List[core.RoomTile]
+	gpMu     sync.RWMutex
+
+	statuses map[core.HabboRoomUnitStatus]string
+	statMu   sync.RWMutex
+
+	ticker *time.Ticker
+	tkMu   sync.RWMutex
 }
 
 // p	panic("unimplemented")tatuses implements core.IHabboRoomUnit.
 func (h *habboRoomUnit) Statuses() map[core.HabboRoomUnitStatus]string {
-	h.statusMutex.Lock()
-	defer h.statusMutex.Unlock()
+	h.statMu.Lock()
+	defer h.statMu.Unlock()
+
 	return h.statuses
 }
 
 // PreviousTile implements core.IHabboRoomUnit.
 func (h *habboRoomUnit) PreviousTile() core.RoomTile {
+	h.ptMu.RLock()
+	defer h.ptMu.RUnlock()
+
 	return h.previousTile
 }
 
 // SetPreviousTile implements core.IHabboRoomUnit.
 func (h *habboRoomUnit) SetPreviousTile(tile core.RoomTile) {
+	h.ptMu.Lock()
 	h.previousTile = tile
+	h.ptMu.Unlock()
 }
 
 // WalkTo implements core.IHabboRoomUnit.
@@ -56,9 +73,10 @@ func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.RoomTile, client c
 		return
 	}
 
-	h.goalTileMutex.Lock()
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	h.goalTile = tile
-	h.goalTileMutex.Unlock()
 
 	if h.ticker == nil {
 		ctx, cancel := context.WithCancel(ctx)
@@ -88,29 +106,29 @@ func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.RoomTile, client c
 			h.SetBodyRotation(direction)
 			h.SetHeadRotation(direction)
 
-			h.statusMutex.Lock()
 			h.statuses[core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove)] = fmt.Sprintf("%d,%d,%.1f", next.GetX(), next.GetY(), next.GetHeight())
-			h.statusMutex.Unlock()
 
 			h.SetPreviousTile(h.currentTile)
 			h.SetCurrentTile(next)
 
-			client.SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(client.GetHabbo().RoomUnit().Room().GetHabbos()))
+			client.SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer([]core.Habbo{h.Habbo()}))
 		})
 	}
 }
 
 func (h *habboRoomUnit) stopWalking(cancel context.CancelFunc) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	h.SetPreviousTile(h.currentTile)
 
 	delete(h.statuses, core.HabboRoomUnitStatus(core.HabboRoomUnitStatusMove))
-
-	h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer(h.Room().GetHabbos()))
+	h.habbo.Client().SendToRoom(h.room, room_units.NewRoomUnitStatusWithHabbosComposer([]core.Habbo{h.habbo}))
 
 	h.ticker.Stop()
 	cancel()
-	h.ticker = nil
 
+	h.ticker = nil
 	h.goalTile = nil
 	h.goalPath = nil
 }
@@ -128,27 +146,42 @@ func (h *habboRoomUnit) Room() core.Room {
 }
 
 func (h *habboRoomUnit) CurrentTile() core.RoomTile {
+	h.ctMu.RLock()
+	defer h.ctMu.RUnlock()
+
 	return h.currentTile
 }
 
 func (h *habboRoomUnit) HeadRotation() core.RoomTileDirection {
+	h.hrMu.RLock()
+	defer h.hrMu.RUnlock()
+
 	return h.headRotation
 }
 
 func (h *habboRoomUnit) BodyRotation() core.RoomTileDirection {
+	h.brMu.RLock()
+	defer h.brMu.RUnlock()
+
 	return h.bodyRotation
 }
 
 func (h *habboRoomUnit) SetCurrentTile(tile core.RoomTile) {
+	h.ctMu.Lock()
 	h.currentTile = tile
+	h.ctMu.Unlock()
 }
 
 func (h *habboRoomUnit) SetHeadRotation(rotation core.RoomTileDirection) {
+	h.hrMu.Lock()
 	h.headRotation = rotation
+	h.hrMu.Unlock()
 }
 
 func (h *habboRoomUnit) SetBodyRotation(rotation core.RoomTileDirection) {
+	h.brMu.Lock()
 	h.bodyRotation = rotation
+	h.brMu.Unlock()
 }
 
 func (h *habboRoomUnit) SetRoom(room core.Room) {
@@ -172,7 +205,15 @@ func NewHabboRoomUnit(id int32, habbo core.Habbo, room core.Room, currentTile co
 	habboRoomUnit.room = room
 	habboRoomUnit.currentTile = currentTile
 	habboRoomUnit.bodyRotation = bodyRotation
-	habboRoomUnit.statusMutex = sync.Mutex{}
+	habboRoomUnit.statMu = sync.RWMutex{}
+	habboRoomUnit.ptMu = sync.RWMutex{}
+	habboRoomUnit.hrMu = sync.RWMutex{}
+	habboRoomUnit.brMu = sync.RWMutex{}
+	habboRoomUnit.gtMu = sync.RWMutex{}
+	habboRoomUnit.gpMu = sync.RWMutex{}
+	habboRoomUnit.ctMu = sync.RWMutex{}
+	habboRoomUnit.tkMu = sync.RWMutex{}
+	habboRoomUnit.mu = sync.RWMutex{}
 	habboRoomUnit.statuses = make(map[core.HabboRoomUnitStatus]string)
 	currentTile.AddHabboRoomUnit(habboRoomUnit)
 	return habboRoomUnit

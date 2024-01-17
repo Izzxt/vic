@@ -3,6 +3,7 @@ package habboclient
 import (
 	"context"
 	"log"
+	"sync"
 
 	"github.com/Izzxt/vic/codec"
 	"github.com/Izzxt/vic/core"
@@ -11,47 +12,73 @@ import (
 )
 
 type habboClient struct {
-	ctx        context.Context
-	conn       *websocket.Conn
-	outgoing   chan core.OutgoingMessage
-	done       chan struct{}
-	networking core.Networking
-	clients    map[*websocket.Conn]core.HabboClient
+	ctx  context.Context
+	conn *websocket.Conn
+
+	clients   map[*websocket.Conn]core.HabboClient
+	clientsMu sync.RWMutex
+
+	outgoing chan core.OutgoingMessage
+	done     chan struct{}
+
 	messages   core.Messages
-	habbo      core.Habbo
+	networking core.Networking
+
+	habbo   core.Habbo
+	habboMu sync.RWMutex
 
 	navigator core.NavigatorManager
-	room      core.RoomManager
+	navMu     sync.RWMutex
+
+	room   core.RoomManager
+	roomMu sync.RWMutex
+
+	inMu sync.RWMutex
 }
 
 // Navigator implements core.HabboClient.
 func (h *habboClient) Navigator() core.NavigatorManager {
+	h.navMu.RLock()
+	defer h.navMu.RUnlock()
+
 	return h.navigator
 }
 
 // Room implements core.HabboClient.
 func (h *habboClient) Room() core.RoomManager {
+	h.roomMu.RLock()
+	defer h.roomMu.RUnlock()
+
 	return h.room
 }
 
 // SetNavigator implements core.HabboClient.
 func (h *habboClient) SetNavigator(m core.NavigatorManager) {
+	h.navMu.Lock()
 	h.navigator = m
+	h.navMu.Unlock()
 }
 
 // SetRoom implements core.HabboClient.
 func (h *habboClient) SetRoom(m core.RoomManager) {
+	h.roomMu.Lock()
 	h.room = m
+	h.roomMu.Unlock()
 }
 
 // GetHabbo implements core.HabboClient.
 func (h *habboClient) GetHabbo() core.Habbo {
+	h.habboMu.RLock()
+	defer h.habboMu.RUnlock()
+
 	return h.habbo
 }
 
 // SetHabbo implements core.HabboClient.
 func (h *habboClient) SetHabbo(habbo core.Habbo) {
+	h.habboMu.Lock()
 	h.habbo = habbo
+	h.habboMu.Unlock()
 }
 
 // SendToHabbos implements core.HabboClient.
@@ -68,7 +95,9 @@ func (h *habboClient) SendToRoom(room core.Room, out core.OutgoingMessage) {
 
 // AddClient implements core.HabboClient.
 func (h *habboClient) AddClient(conn *websocket.Conn) {
+	h.clientsMu.Lock()
 	h.clients[conn] = h
+	h.clientsMu.Unlock()
 }
 
 // GetContext implements core.HabboClient.
@@ -101,8 +130,14 @@ func (h *habboClient) readMessage() {
 			}
 
 			data, _, header := codec.Decode(msg, h)
+
+			h.inMu.Lock()
 			incomingPacket := messages.NewIncomingPacket(header, data)
+			h.inMu.Unlock()
+
+			h.inMu.RLock()
 			h.messages.HandleMessages(h, incomingPacket)
+			h.inMu.RUnlock()
 		}
 	}
 }
@@ -131,14 +166,24 @@ func (h *habboClient) Connection() *websocket.Conn {
 	return h.conn
 }
 
-func NewHabboClient(ctx context.Context, conn *websocket.Conn, messages core.Messages, networking core.Networking) core.HabboClient {
+func NewHabboClient(ctx context.Context, conn *websocket.Conn,
+	messages core.Messages, networking core.Networking,
+) core.HabboClient {
 	if conn == nil {
 		panic("conn cannot be nil")
 	}
 
-	outgoing := make(chan core.OutgoingMessage)
+	outgoing := make(chan core.OutgoingMessage, 100)
 	done := make(chan struct{})
 	clients := make(map[*websocket.Conn]core.HabboClient)
 
-	return &habboClient{ctx: ctx, conn: conn, outgoing: outgoing, done: done, messages: messages, networking: networking, clients: clients}
+	return &habboClient{
+		ctx:        ctx,
+		conn:       conn,
+		outgoing:   outgoing,
+		done:       done,
+		messages:   messages,
+		networking: networking,
+		clients:    clients,
+	}
 }
