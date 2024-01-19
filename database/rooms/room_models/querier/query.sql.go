@@ -30,6 +30,27 @@ func (q *Queries) GetModelById(ctx context.Context, id int32) (RoomModel, error)
 	return i, err
 }
 
+const GetModelByName = `-- name: GetModelByName :one
+SELECT id, name, heightmap, is_club, is_custom, x, y, dir FROM room_models
+WHERE name = ?
+`
+
+func (q *Queries) GetModelByName(ctx context.Context, name string) (RoomModel, error) {
+	row := q.db.QueryRowContext(ctx, GetModelByName, name)
+	var i RoomModel
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Heightmap,
+		&i.IsClub,
+		&i.IsCustom,
+		&i.X,
+		&i.Y,
+		&i.Dir,
+	)
+	return i, err
+}
+
 const ListRoomModels = `-- name: ListRoomModels :many
 SELECT id, name, heightmap, is_club, is_custom, x, y, dir FROM room_models
 `

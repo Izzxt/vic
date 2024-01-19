@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CreateRoom(ctx context.Context, arg CreateRoomParams) (int64, error)
 	GetActiveRooms(ctx context.Context) ([]GetActiveRoomsRow, error)
 	GetRoomById(ctx context.Context, id int32) (Room, error)
 	GetRoomsByOwnerId(ctx context.Context, id int32) ([]GetRoomsByOwnerIdRow, error)

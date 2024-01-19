@@ -59,6 +59,7 @@ func (m *messages) RegisterMessages() {
 	m.RegisterIncomingMessage(incoming.RequestRoomDataEvent, &room.RequestRoomDataEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomLoadEvent, &room.RequestRoomLoadEvent{})
 	m.RegisterIncomingMessage(incoming.RequestRoomHeightmapEvent, &room.RequestRoomHeightmapEvent{})
+	m.RegisterIncomingMessage(incoming.RoomCreateEvent, &room.RoomCreateEvent{})
 
 	// Room unit
 	m.RegisterIncomingMessage(incoming.RoomUnitWalkEvent, &room_units.RoomUnitWalkEvent{})

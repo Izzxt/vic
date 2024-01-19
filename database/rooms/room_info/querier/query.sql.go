@@ -9,6 +9,44 @@ import (
 	"context"
 )
 
+const CreateRoom = `-- name: CreateRoom :execlastid
+INSERT INTO rooms (
+  owner_id,
+  name,
+  description,
+  max_users,
+  model_id,
+  flat_category_id,
+  trade_mode
+) VALUES (?, ?, ?, ?, ?, ?, ?)
+`
+
+type CreateRoomParams struct {
+	OwnerID        int32  `json:"owner_id"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	MaxUsers       int32  `json:"max_users"`
+	ModelID        int32  `json:"model_id"`
+	FlatCategoryID int32  `json:"flat_category_id"`
+	TradeMode      int32  `json:"trade_mode"`
+}
+
+func (q *Queries) CreateRoom(ctx context.Context, arg CreateRoomParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, CreateRoom,
+		arg.OwnerID,
+		arg.Name,
+		arg.Description,
+		arg.MaxUsers,
+		arg.ModelID,
+		arg.FlatCategoryID,
+		arg.TradeMode,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const GetActiveRooms = `-- name: GetActiveRooms :many
 SELECT r.id, r.owner_id, r.name, r.description, r.model_id, r.password, r.state, r.users, r.max_users, r.flat_category_id, r.score, r.floorpaper, r.wallpaper, r.landscape, r.wall_thickness, r.wall_height, r.floor_thickness, r.tags, r.is_public, r.is_staff_picked, r.allow_other_pets, r.allow_other_pets_eat, r.allow_walkthrough, r.is_wall_hidden, r.chat_mode, r.chat_weight, r.chat_scrolling_speed, r.chat_hearing_distance, r.chat_protection, r.who_can_mute, r.who_can_kick, r.who_can_ban, r.roller_speed, r.is_promoted, r.trade_mode, r.move_diagonal, r.is_wired_hidden, r.is_forsale, u.id, u.username, u.password, u.auth_ticket, u.email, u.rank_id, u.account_created_date, u.last_online_date, u.is_online, u.motto, u.look, u.gender, u.ip_register, u.ip_current, u.home_room
 FROM rooms as r

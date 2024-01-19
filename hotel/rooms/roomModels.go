@@ -65,6 +65,18 @@ func (r *RoomModels) Load(id int32) core.RoomModel {
 	return r
 }
 
+func (r *RoomModels) GetModelByName(name string) core.RoomModel {
+	db := database.GetInstance().RoomModels()
+
+	model, err := db.GetModelByName(r.ctx, name)
+	if err != nil {
+		panic(err)
+	}
+
+	r.RoomModel = model
+	return r
+}
+
 func NewRoomModels(ctx context.Context) core.RoomModel {
 	return &RoomModels{ctx: ctx}
 }

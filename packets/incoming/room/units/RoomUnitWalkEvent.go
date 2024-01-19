@@ -2,8 +2,6 @@ package room
 
 import (
 	"context"
-	"fmt"
-	"net"
 
 	"github.com/Izzxt/vic/core"
 )
@@ -19,6 +17,5 @@ func (e *RoomUnitWalkEvent) Execute(client core.HabboClient, in core.IncomingPac
 		return
 	}
 
-	fmt.Println("client: ", client.Connection().RemoteAddr().(*net.TCPAddr).Port)
 	client.GetHabbo().RoomUnit().WalkTo(context.Background(), tile, client)
 }

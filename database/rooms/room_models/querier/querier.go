@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	GetModelById(ctx context.Context, id int32) (RoomModel, error)
+	GetModelByName(ctx context.Context, name string) (RoomModel, error)
 	ListRoomModels(ctx context.Context) ([]RoomModel, error)
 }
 

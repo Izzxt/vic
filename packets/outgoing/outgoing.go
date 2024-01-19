@@ -38,6 +38,7 @@ const (
 	RoomUserDataComposer   = 3920
 	RoomUserStatusComposer = 1640
 	RoomOwnerComposer      = 339
+	RoomCreatedComposer    = 1304
 
 	// Room Unit
 	RoomUnitComposer       = 374

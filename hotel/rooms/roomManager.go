@@ -10,8 +10,9 @@ import (
 )
 
 type RoomManager struct {
-	ctx  context.Context
-	room core.Room
+	ctx   context.Context
+	room  core.Room
+	model core.RoomModel
 }
 
 var (
@@ -27,7 +28,7 @@ func (r *RoomManager) GetRoom(id int32) core.Room {
 	roomInfo := NewRoomInfo(r.ctx).Load(id)
 	room := NewRoom(r.ctx, roomInfo)
 
-	model := NewRoomModels(r.ctx).Load(roomInfo.GetModelId())
+	model := r.model.Load(roomInfo.GetModelId())
 	room.SetModel(model)
 	rooms[id] = room
 
@@ -52,8 +53,33 @@ func (r *RoomManager) GetRoomsByOwnerId(ownerId int32) []room_info.GetRoomsByOwn
 	return roomInfos
 }
 
+func (r *RoomManager) CreateRoom(ownerId int32, name string, description string, modelId int32, categoryId int32, maxVisitors int32, tradeType int32) core.Room {
+	db := database.GetInstance().RoomInfo()
+	id, err := db.CreateRoom(r.ctx, room_info.CreateRoomParams{
+		OwnerID:        ownerId,
+		Name:           name,
+		Description:    description,
+		ModelID:        modelId,
+		FlatCategoryID: categoryId,
+		MaxUsers:       maxVisitors,
+		TradeMode:      tradeType,
+	})
+	if err != nil {
+		fmt.Printf("failed to create room: %v", err)
+	}
+
+	room := r.GetRoom(int32(id))
+
+	return room
+}
+
+func (r *RoomManager) Model() core.RoomModel {
+	return r.model
+}
+
 func NewRoomManager(ctx context.Context) core.RoomManager {
 	roomManager := RoomManager{}
 	roomManager.ctx = ctx
+	roomManager.model = NewRoomModels(ctx)
 	return &roomManager
 }

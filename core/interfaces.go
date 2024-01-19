@@ -180,13 +180,16 @@ type RoomTile interface {
 }
 
 type RoomManager interface {
+	Model() RoomModel
 	GetRoom(int32) Room
 	GetRoomsByOwnerId(ownerId int32) []room_info.GetRoomsByOwnerIdRow
 	GetActiveRooms() []room_info.GetActiveRoomsRow
+	CreateRoom(ownerId int32, name string, description string, modelId int32, categoryId int32, maxVisitors int32, tradeType int32) Room
 }
 
 type RoomModel interface {
 	Load(int32) RoomModel
+	GetModelByName(string) RoomModel
 	GetId() int32
 	GetName() string
 	GetHeightmap() string

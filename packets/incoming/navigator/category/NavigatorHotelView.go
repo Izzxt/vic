@@ -19,6 +19,8 @@ func NewNavigatorHotelView(searchCode string, searchQuery string, results core.N
 	}
 }
 
+// TODO: filter rooms by permissions and can see invisible rooms
+
 func (c *navigatorHotelView) Compose(compose core.OutgoingPacket) {
 	compose.WriteString(c.searchCode)
 	compose.WriteString(c.searchQuery)
