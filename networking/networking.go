@@ -18,6 +18,7 @@ type networking struct {
 	messages  core.Messages
 	navigator core.NavigatorManager
 	room      core.RoomManager
+	server    *http.Server
 }
 
 // Run implements Networking.
@@ -41,7 +42,13 @@ func (n *networking) StartWS() error {
 
 	http.HandleFunc("/", handler)
 
-	return http.ListenAndServe(fmt.Sprintf("%s:%d", n.host, n.port), nil)
+	n.server = &http.Server{Addr: fmt.Sprintf("%s:%d", n.host, n.port)}
+	err := n.server.ListenAndServe()
+	return err
+}
+
+func (n *networking) Shutdown() error {
+	return n.server.Shutdown(n.ctx)
 }
 
 var upgrader = websocket.Upgrader{

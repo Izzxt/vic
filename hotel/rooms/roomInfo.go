@@ -2,6 +2,7 @@ package rooms
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
@@ -9,8 +10,13 @@ import (
 )
 
 type RoomInfo struct {
-	room_info.Room
+	room_info.GetRoomByIdRow
 	ctx context.Context
+}
+
+// GetOwnerId implements core.RoomInfo.
+func (r *RoomInfo) GetOwnerId() int32 {
+	return r.OwnerID
 }
 
 // GetAllowOtherPets implements core.IRoomInfo.
@@ -198,6 +204,18 @@ func (r *RoomInfo) GetWhoCanMute() int32 {
 	return r.WhoCanMute
 }
 
+func (r *RoomInfo) Owner() room_info.User {
+	return r.User
+}
+
+func (r *RoomInfo) UpdateOnlineCount(count int32) {
+	db := database.GetInstance().RoomInfo()
+	err := db.UpdateRoomUsers(r.ctx, room_info.UpdateRoomUsersParams{Users: count, ID: r.ID})
+	if err != nil {
+		fmt.Printf("Error updating room users: %v\n", err)
+	}
+}
+
 func (r *RoomInfo) Load(id int32) core.RoomInfo {
 	db := database.GetInstance().RoomInfo()
 	room, err := db.GetRoomById(r.ctx, id)
@@ -205,7 +223,7 @@ func (r *RoomInfo) Load(id int32) core.RoomInfo {
 		panic(err)
 	}
 
-	r.Room = room
+	r.GetRoomByIdRow = room
 
 	return r
 }

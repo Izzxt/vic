@@ -73,6 +73,12 @@ func (r *RoomManager) CreateRoom(ownerId int32, name string, description string,
 	return room
 }
 
+func (r *RoomManager) Shutdown() {
+	for _, room := range rooms {
+		room.UnloadRoom()
+	}
+}
+
 func (r *RoomManager) Model() core.RoomModel {
 	return r.model
 }

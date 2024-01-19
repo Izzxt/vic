@@ -10,16 +10,13 @@ import (
 	room_units "github.com/Izzxt/vic/packets/outgoing/room/units"
 )
 
-var (
-	isLoaded       = false
-	counter  int32 = 0
-)
-
 type Room struct {
-	model   core.RoomModel
-	info    core.RoomInfo
-	tileMap core.RoomTileMap
-	habbos  []core.Habbo
+	model    core.RoomModel
+	info     core.RoomInfo
+	tileMap  core.RoomTileMap
+	isLoaded bool
+	counter  int32
+	habbos   []core.Habbo
 }
 
 // GetHabbos implements core.IRoom.
@@ -40,15 +37,16 @@ func (r *Room) SetModel(model core.RoomModel) {
 // SuccessEnterRoom implements core.IRoom.
 func (r *Room) SuccessEnterRoom(habbo core.Habbo) {
 	// habbo room unit
-	roomUnit := habbo_unit.NewHabboRoomUnit(counter, habbo, r, r.tileMap.GetDoorTile(), r.TileMap().GetDoorDirection())
-	counter++
+	roomUnit := habbo_unit.NewHabboRoomUnit(r.counter, habbo, r, r.tileMap.GetDoorTile(), r.TileMap().GetDoorDirection())
+	r.counter++
 	roomUnit.SetPreviousTile(r.tileMap.GetDoorTile())
 	habbo.SetRoomUnit(roomUnit)
-	// update room habbos size
+	habbo.Room().Info().UpdateOnlineCount(int32(len(r.habbos)))
 
 	// send room user owner info
 	// send room thickness
 	// send room info
+	habbo.Client().Send(&room.RoomDataComposer{Room: r, Enter: true, Forward: false})
 
 	// send room unit
 	habbo.Client().SendToRoom(r, &room_units.RoomUnitComposer{Habbos: r.habbos})
@@ -59,11 +57,11 @@ func (r *Room) SuccessEnterRoom(habbo core.Habbo) {
 
 // EnterRoom implements core.IRoom.
 func (r *Room) EnterRoom(habbo core.Habbo) {
-	if habbo == nil {
-		habbo.Room().LeaveRoom(habbo, true)
+	if habbo.Room() != nil {
+		habbo.Room().LeaveRoom(habbo, false)
 	}
 
-	if !isLoaded {
+	if !r.isLoaded {
 		r.LoadRoom()
 	}
 
@@ -72,11 +70,28 @@ func (r *Room) EnterRoom(habbo core.Habbo) {
 
 // LeaveRoom implements core.IRoom.
 func (r *Room) LeaveRoom(habbo core.Habbo, hotelview bool) {
+	habbo.Client().SendToRoom(r, &room_units.RoomUnitRemoveComposer{RoomUnit: habbo.RoomUnit()})
 
 	habbo.SetRoom(nil)
+	habbo.SetRoomUnit(nil)
 
 	// Remove habbo from room.
+	r.RemoveHabbo(habbo)
 
+	// update users count
+	r.info.UpdateOnlineCount(int32(len(r.habbos)))
+
+	for _, t := range r.tileMap.GetDoorTile().HabboOnTiles() {
+		t.CurrentTile().RemoveHabboOnTile(habbo)
+	}
+
+	if hotelview {
+		// TODO: send to hotel view
+	}
+
+	if len(r.habbos) == 0 {
+		r.UnloadRoom()
+	}
 }
 
 func (r *Room) GetHabbo(id int32) core.Habbo {
@@ -109,14 +124,24 @@ func (r *Room) PrepareRoom(habbo core.Habbo) {
 }
 
 // UnloadRoom implements core.IRoom.
-func (*Room) UnloadRoom(core.Habbo) {
-	panic("unimplemented")
+func (r *Room) UnloadRoom() {
+	if !r.isLoaded {
+		return
+	}
+
+	for _, habbo := range r.habbos {
+		r.LeaveRoom(habbo, true)
+	}
+
+	r.tileMap = nil
+	r.counter = 0
+	r.isLoaded = false
 }
 
 func (r *Room) LoadRoom() {
 	r.tileMap = tiles.NewRoomTileMap(r, r.model)
 
-	isLoaded = true
+	r.isLoaded = true
 }
 
 // Model implements core.IRoom.
@@ -132,6 +157,8 @@ func (r *Room) Info() core.RoomInfo {
 func NewRoom(ctx context.Context, roomInfo core.RoomInfo) core.Room {
 	room := Room{}
 	room.info = roomInfo
+	room.isLoaded = false
+	room.counter = 0
 	room.habbos = make([]core.Habbo, 0)
 	return &room
 }

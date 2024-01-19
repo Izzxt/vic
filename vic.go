@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
@@ -16,6 +17,7 @@ import (
 	"github.com/Izzxt/vic/messages"
 	"github.com/Izzxt/vic/networking"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/websocket"
 )
 
 type Vic struct {
@@ -48,12 +50,31 @@ func (v *Vic) Init() {
 	m.RegisterMessages()
 
 	net = networking.NewNetworking(context.Background(), host, port, m, navigator, room)
-	if err := net.StartWS(); err != nil {
-		fmt.Printf("Error starting websocket: %v", err)
-	}
-	fmt.Printf("Started websocket on %s:%d", host, port)
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
+	shutCtx, cancel := context.WithCancel(ctx)
+
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		<-c
+		<-time.After(1 * time.Second)
+		fmt.Println("Shutting down...")
+
+		room.Shutdown()
+		if err := net.Shutdown(); err != nil {
+			fmt.Printf("Error shutting down websocket: %v\n", err)
+		}
+
+		cancel()
+	}()
+
+	if err := net.StartWS(); err != nil {
+		if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+			fmt.Println("Shutting down...")
+		} else {
+			fmt.Printf("Error starting websocket: %v\n", err)
+		}
+	}
+
+	<-shutCtx.Done()
 }

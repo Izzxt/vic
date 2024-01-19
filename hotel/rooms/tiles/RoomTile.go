@@ -18,6 +18,14 @@ func (r *RoomTile) AddHabboRoomUnit(h core.HabboRoomUnit) {
 	r.habboOnTiles = append(r.habboOnTiles, h)
 }
 
+func (r *RoomTile) RemoveHabboOnTile(habbo core.Habbo) {
+	for i, habboOnTile := range r.habboOnTiles {
+		if habboOnTile.Habbo() == habbo {
+			r.habboOnTiles = append(r.habboOnTiles[:i], r.habboOnTiles[i+1:]...)
+		}
+	}
+}
+
 func (r *RoomTile) RemoveHabboRoomUnit(h core.HabboRoomUnit) {
 	for i, habbo := range r.habboOnTiles {
 		if habbo == h {

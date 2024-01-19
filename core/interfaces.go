@@ -63,6 +63,7 @@ type HabboClient interface {
 
 type Networking interface {
 	StartWS() error
+	Shutdown() error
 }
 
 type Messages interface {
@@ -143,7 +144,7 @@ type Room interface {
 	EnterRoom(Habbo)
 	LeaveRoom(Habbo, bool)
 	PrepareRoom(Habbo)
-	UnloadRoom(Habbo)
+	UnloadRoom()
 	SuccessEnterRoom(Habbo)
 	SetModel(RoomModel)
 	TileMap() RoomTileMap
@@ -177,6 +178,7 @@ type RoomTile interface {
 	HabboOnTiles() []HabboRoomUnit
 	AddHabboRoomUnit(HabboRoomUnit)
 	RemoveHabboRoomUnit(HabboRoomUnit)
+	RemoveHabboOnTile(Habbo)
 }
 
 type RoomManager interface {
@@ -185,6 +187,7 @@ type RoomManager interface {
 	GetRoomsByOwnerId(ownerId int32) []room_info.GetRoomsByOwnerIdRow
 	GetActiveRooms() []room_info.GetActiveRoomsRow
 	CreateRoom(ownerId int32, name string, description string, modelId int32, categoryId int32, maxVisitors int32, tradeType int32) Room
+	Shutdown()
 }
 
 type RoomModel interface {
@@ -201,8 +204,10 @@ type RoomModel interface {
 }
 
 type RoomInfo interface {
+	UpdateOnlineCount(count int32)
 	Load(int32) RoomInfo
 	GetId() int32
+	GetOwnerId() int32
 	GetName() string
 	GetDescription() string
 	GetModelId() int32
@@ -239,4 +244,5 @@ type RoomInfo interface {
 	GetMoveDiagonal() bool
 	GetIsWiredHidden() bool
 	GetIsForsale() bool
+	Owner() room_info.User
 }

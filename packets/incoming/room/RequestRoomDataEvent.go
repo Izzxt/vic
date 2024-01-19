@@ -9,13 +9,18 @@ type RequestRoomDataEvent struct{}
 
 // Execute implements core.IIncomingMessage.
 func (e *RequestRoomDataEvent) Execute(client core.HabboClient, in core.IncomingPacket) {
-	// roomId := in.ReadInt()
-	// forward := in.ReadBool()
+	roomId := in.ReadInt()
+	forward := in.ReadBool()
 	enter := in.ReadBool()
 
-	// client.GetHabbo().EnterRoom(r)
+	r := client.Room().GetRoom(roomId)
+	if r == nil {
+		return
+	}
 
-	// e.Log.Debug().Int32("roomId", roomId).Bool("forward", forward).Bool("enter", enter).Msg("request room data event")
+	if forward && !enter {
+		enter = false
+	}
 
-	client.Send(&room.RoomDataComposer{Enter: enter, Forward: true})
+	client.Send(&room.RoomDataComposer{Room: r, Enter: enter, Forward: forward})
 }

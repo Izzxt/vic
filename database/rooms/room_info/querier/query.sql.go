@@ -137,13 +137,57 @@ func (q *Queries) GetActiveRooms(ctx context.Context) ([]GetActiveRoomsRow, erro
 }
 
 const GetRoomById = `-- name: GetRoomById :one
-SELECT id, owner_id, name, description, model_id, password, state, users, max_users, flat_category_id, score, floorpaper, wallpaper, landscape, wall_thickness, wall_height, floor_thickness, tags, is_public, is_staff_picked, allow_other_pets, allow_other_pets_eat, allow_walkthrough, is_wall_hidden, chat_mode, chat_weight, chat_scrolling_speed, chat_hearing_distance, chat_protection, who_can_mute, who_can_kick, who_can_ban, roller_speed, is_promoted, trade_mode, move_diagonal, is_wired_hidden, is_forsale FROM rooms
-WHERE id = ? LIMIT 1
+SELECT r.id, r.owner_id, r.name, r.description, r.model_id, r.password, r.state, r.users, r.max_users, r.flat_category_id, r.score, r.floorpaper, r.wallpaper, r.landscape, r.wall_thickness, r.wall_height, r.floor_thickness, r.tags, r.is_public, r.is_staff_picked, r.allow_other_pets, r.allow_other_pets_eat, r.allow_walkthrough, r.is_wall_hidden, r.chat_mode, r.chat_weight, r.chat_scrolling_speed, r.chat_hearing_distance, r.chat_protection, r.who_can_mute, r.who_can_kick, r.who_can_ban, r.roller_speed, r.is_promoted, r.trade_mode, r.move_diagonal, r.is_wired_hidden, r.is_forsale, u.id, u.username, u.password, u.auth_ticket, u.email, u.rank_id, u.account_created_date, u.last_online_date, u.is_online, u.motto, u.look, u.gender, u.ip_register, u.ip_current, u.home_room
+FROM rooms as r
+JOIN users as u ON u.id = r.owner_id
+WHERE r.id = ? LIMIT 1
 `
 
-func (q *Queries) GetRoomById(ctx context.Context, id int32) (Room, error) {
+type GetRoomByIdRow struct {
+	ID                  int32      `json:"id"`
+	OwnerID             int32      `json:"owner_id"`
+	Name                string     `json:"name"`
+	Description         string     `json:"description"`
+	ModelID             int32      `json:"model_id"`
+	Password            string     `json:"password"`
+	State               RoomsState `json:"state"`
+	Users               int32      `json:"users"`
+	MaxUsers            int32      `json:"max_users"`
+	FlatCategoryID      int32      `json:"flat_category_id"`
+	Score               int32      `json:"score"`
+	Floorpaper          string     `json:"floorpaper"`
+	Wallpaper           string     `json:"wallpaper"`
+	Landscape           string     `json:"landscape"`
+	WallThickness       int32      `json:"wall_thickness"`
+	WallHeight          int32      `json:"wall_height"`
+	FloorThickness      int32      `json:"floor_thickness"`
+	Tags                string     `json:"tags"`
+	IsPublic            bool       `json:"is_public"`
+	IsStaffPicked       bool       `json:"is_staff_picked"`
+	AllowOtherPets      bool       `json:"allow_other_pets"`
+	AllowOtherPetsEat   bool       `json:"allow_other_pets_eat"`
+	AllowWalkthrough    bool       `json:"allow_walkthrough"`
+	IsWallHidden        bool       `json:"is_wall_hidden"`
+	ChatMode            int32      `json:"chat_mode"`
+	ChatWeight          int32      `json:"chat_weight"`
+	ChatScrollingSpeed  int32      `json:"chat_scrolling_speed"`
+	ChatHearingDistance int32      `json:"chat_hearing_distance"`
+	ChatProtection      int32      `json:"chat_protection"`
+	WhoCanMute          int32      `json:"who_can_mute"`
+	WhoCanKick          int32      `json:"who_can_kick"`
+	WhoCanBan           int32      `json:"who_can_ban"`
+	RollerSpeed         int32      `json:"roller_speed"`
+	IsPromoted          bool       `json:"is_promoted"`
+	TradeMode           int32      `json:"trade_mode"`
+	MoveDiagonal        bool       `json:"move_diagonal"`
+	IsWiredHidden       bool       `json:"is_wired_hidden"`
+	IsForsale           bool       `json:"is_forsale"`
+	User                User       `json:"user"`
+}
+
+func (q *Queries) GetRoomById(ctx context.Context, id int32) (GetRoomByIdRow, error) {
 	row := q.db.QueryRowContext(ctx, GetRoomById, id)
-	var i Room
+	var i GetRoomByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.OwnerID,
@@ -183,6 +227,21 @@ func (q *Queries) GetRoomById(ctx context.Context, id int32) (Room, error) {
 		&i.MoveDiagonal,
 		&i.IsWiredHidden,
 		&i.IsForsale,
+		&i.User.ID,
+		&i.User.Username,
+		&i.User.Password,
+		&i.User.AuthTicket,
+		&i.User.Email,
+		&i.User.RankID,
+		&i.User.AccountCreatedDate,
+		&i.User.LastOnlineDate,
+		&i.User.IsOnline,
+		&i.User.Motto,
+		&i.User.Look,
+		&i.User.Gender,
+		&i.User.IpRegister,
+		&i.User.IpCurrent,
+		&i.User.HomeRoom,
 	)
 	return i, err
 }
@@ -340,4 +399,18 @@ func (q *Queries) ListRooms(ctx context.Context) ([]Room, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const UpdateRoomUsers = `-- name: UpdateRoomUsers :exec
+UPDATE rooms SET users = ? WHERE id = ?
+`
+
+type UpdateRoomUsersParams struct {
+	Users int32 `json:"users"`
+	ID    int32 `json:"id"`
+}
+
+func (q *Queries) UpdateRoomUsers(ctx context.Context, arg UpdateRoomUsersParams) error {
+	_, err := q.db.ExecContext(ctx, UpdateRoomUsers, arg.Users, arg.ID)
+	return err
 }

@@ -34,7 +34,8 @@ const (
 	// Room
 	RequestRoomDataEvent      = 2230
 	RequestRoomLoadEvent      = 2312
-	RequestRoomHeightmapEvent = 3898 // 2300
+	RequestRoomHeightmapEvent = 3898
+	RequestHeightmapEvent     = 2300
 	RoomCreateEvent           = 2752
 
 	// Room unit

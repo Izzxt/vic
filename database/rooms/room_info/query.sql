@@ -2,8 +2,10 @@
 SELECT * FROM rooms;
 
 -- name: GetRoomById :one
-SELECT * FROM rooms
-WHERE id = ? LIMIT 1;
+SELECT r.*, sqlc.embed(u)
+FROM rooms as r
+JOIN users as u ON u.id = r.owner_id
+WHERE r.id = ? LIMIT 1;
 
 -- name: GetRoomsByOwnerId :many
 SELECT sqlc.embed(r), sqlc.embed(u)
@@ -27,3 +29,6 @@ INSERT INTO rooms (
   flat_category_id,
   trade_mode
 ) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- name: UpdateRoomUsers :exec
+UPDATE rooms SET users = ? WHERE id = ?;
