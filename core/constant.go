@@ -67,3 +67,42 @@ const (
 	HabboRoomUnitStatusSleep    = "slp"
 	HabboRoomUnitStatusSleepOut = "slp-out"
 )
+
+type NavigatorCategoryType string
+
+const (
+	NavigatorCategoryTypeOfficial = "official_view"
+	NavigatorCategoryTypeHotel    = "hotel_view"
+	NavigatorCategoryTypeRoomAds  = "roomads_view"
+	NavigatorCategoryTypeMyWorld  = "myworld_view"
+)
+
+type NavigatorDisplayMode bool
+
+const (
+	NavigatorDisplayModeCollapsed NavigatorDisplayMode = true
+	NavigatorDisplayModeExpanded                       = false
+)
+
+type NavigatorListMode int32
+
+const (
+	NavigatorListModeList NavigatorListMode = iota
+	NavigatorListModeThumbnail
+	NavigatorListModeForceThumbnail
+)
+
+type NavigatorDisplayOrder int32
+
+const (
+	NavigatorDisplayOrderOrder NavigatorDisplayOrder = iota
+	NavigatorDisplayOrderActivity
+)
+
+type NavigatorSearchAction int32
+
+const (
+	NavigatorSearchActionNone NavigatorSearchAction = iota
+	NavigatorSearchActionSearch
+	NavigatorSearchActionGoToRoom
+)

@@ -2,8 +2,11 @@ package rooms
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Izzxt/vic/core"
+	"github.com/Izzxt/vic/database"
+	room_info "github.com/Izzxt/vic/database/rooms/room_info/querier"
 )
 
 type RoomManager struct {
@@ -29,6 +32,24 @@ func (r *RoomManager) GetRoom(id int32) core.Room {
 	rooms[id] = room
 
 	return room
+}
+
+func (r *RoomManager) GetActiveRooms() []room_info.GetActiveRoomsRow {
+	db := database.GetInstance().RoomInfo()
+	activeRooms, err := db.GetActiveRooms(r.ctx)
+	if err != nil {
+		fmt.Printf("failed to get active rooms: %v", err)
+	}
+	return activeRooms
+}
+
+func (r *RoomManager) GetRoomsByOwnerId(ownerId int32) []room_info.GetRoomsByOwnerIdRow {
+	db := database.GetInstance().RoomInfo()
+	roomInfos, err := db.GetRoomsByOwnerId(r.ctx, ownerId)
+	if err != nil {
+		fmt.Printf("failed to get rooms by owner id: %v", err)
+	}
+	return roomInfos
 }
 
 func NewRoomManager(ctx context.Context) core.RoomManager {

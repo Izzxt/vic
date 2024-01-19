@@ -74,14 +74,31 @@ type Messages interface {
 type NavigatorManager interface {
 	NavigatorFlatCats() NavigatorFlatCats
 	NavigatorPublicCats() NavigatorPublicCats
+	SearchCategory(HabboClient, string) []NavigatorSearchResults
 }
 
 type NavigatorFlatCats interface {
 	GetCategories() []navigator_flat_cats.NavigatorFlatCat
+	GetCategory(category int32) navigator_flat_cats.NavigatorFlatCat
 }
 
 type NavigatorPublicCats interface {
 	GetCategories() []navigator_public_cats.NavigatorPublicCat
+	GetCategory(category int32) navigator_public_cats.NavigatorPublicCat
+}
+
+type NavigatorSearchResults struct {
+	Identifier string
+	PublicName string
+	Rooms      []interface{}
+}
+
+type NavigatorSearchResultsSet interface {
+	Compose(compose OutgoingPacket)
+}
+
+type A interface {
+	room_info.GetActiveRoomsRow | room_info.GetRoomsByOwnerIdRow
 }
 
 type OutgoingPacket interface {
@@ -164,6 +181,8 @@ type RoomTile interface {
 
 type RoomManager interface {
 	GetRoom(int32) Room
+	GetRoomsByOwnerId(ownerId int32) []room_info.GetRoomsByOwnerIdRow
+	GetActiveRooms() []room_info.GetActiveRoomsRow
 }
 
 type RoomModel interface {

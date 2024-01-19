@@ -11,6 +11,8 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
+	nv "github.com/Izzxt/vic/hotel/navigator"
+	"github.com/Izzxt/vic/hotel/rooms"
 	"github.com/Izzxt/vic/messages"
 	"github.com/Izzxt/vic/networking"
 	_ "github.com/go-sql-driver/mysql"
@@ -28,6 +30,7 @@ var (
 )
 
 func (v *Vic) Init() {
+	ctx := context.Background()
 	sql, err := sql.Open("mysql", "root:root@tcp(localhost:49152)/vic?parseTime=true")
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
@@ -35,8 +38,8 @@ func (v *Vic) Init() {
 
 	database.Init(sql)
 
-	navigator = v.Navigator
-	room = v.Room
+	navigator = nv.NewNavigatorManager(ctx)
+	room = rooms.NewRoomManager(ctx)
 
 	host := ""
 	port := 2097

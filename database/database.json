@@ -4,7 +4,7 @@
     {
       "engine": "mysql",
       "queries": "users/query.sql",
-      "schema": "users/schema.sql",
+      "schema": "schema.sql",
       "gen": {
         "go": {
           "package": "users",
@@ -21,7 +21,7 @@
     {
       "engine": "mysql",
       "queries": "navigator/navigator_flat_cats/query.sql",
-      "schema": "navigator/navigator_flat_cats/schema.sql",
+      "schema": "schema.sql",
       "gen": {
         "go": {
           "package": "navigator_flat_cats",
@@ -38,7 +38,7 @@
     {
       "engine": "mysql",
       "queries": "navigator/navigator_public_cats/query.sql",
-      "schema": "navigator/navigator_public_cats/schema.sql",
+      "schema": "schema.sql",
       "gen": {
         "go": {
           "package": "navigator_public_cats",
@@ -55,7 +55,7 @@
     {
       "engine": "mysql",
       "queries": "rooms/room_info/query.sql",
-      "schema": "rooms/room_info/schema.sql",
+      "schema": "schema.sql",
       "gen": {
         "go": {
           "package": "room_info",
@@ -72,7 +72,7 @@
     {
       "engine": "mysql",
       "queries": "rooms/room_models/query.sql",
-      "schema": "rooms/room_models/schema.sql",
+      "schema": "schema.sql",
       "gen": {
         "go": {
           "package": "room_models",

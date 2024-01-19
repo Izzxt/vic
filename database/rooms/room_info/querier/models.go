@@ -7,6 +7,7 @@ package room_info
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
 )
 
 type RoomsState string
@@ -53,6 +54,67 @@ func (ns NullRoomsState) Value() (driver.Value, error) {
 	return string(ns.RoomsState), nil
 }
 
+type UsersGender string
+
+const (
+	UsersGenderM UsersGender = "M"
+	UsersGenderF UsersGender = "F"
+)
+
+func (e *UsersGender) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UsersGender(s)
+	case string:
+		*e = UsersGender(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UsersGender: %T", src)
+	}
+	return nil
+}
+
+type NullUsersGender struct {
+	UsersGender UsersGender `json:"users_gender"`
+	Valid       bool        `json:"valid"` // Valid is true if UsersGender is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUsersGender) Scan(value interface{}) error {
+	if value == nil {
+		ns.UsersGender, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UsersGender.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUsersGender) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UsersGender), nil
+}
+
+type NavigatorFlatCat struct {
+	ID          int32  `json:"id"`
+	MinRank     int32  `json:"min_rank"`
+	CaptionSave string `json:"caption_save"`
+	Caption     string `json:"caption"`
+	AllowTrade  bool   `json:"allow_trade"`
+	MaxUsers    int32  `json:"max_users"`
+	IsPublic    bool   `json:"is_public"`
+	OrderNum    int32  `json:"order_num"`
+}
+
+type NavigatorPublicCat struct {
+	ID       int32  `json:"id"`
+	Name     string `json:"name"`
+	HasImage bool   `json:"has_image"`
+	Visible  bool   `json:"visible"`
+	OrderNum int32  `json:"order_num"`
+}
+
 type Room struct {
 	ID                  int32      `json:"id"`
 	OwnerID             int32      `json:"owner_id"`
@@ -92,4 +154,33 @@ type Room struct {
 	MoveDiagonal        bool       `json:"move_diagonal"`
 	IsWiredHidden       bool       `json:"is_wired_hidden"`
 	IsForsale           bool       `json:"is_forsale"`
+}
+
+type RoomModel struct {
+	ID        int32  `json:"id"`
+	Name      string `json:"name"`
+	Heightmap string `json:"heightmap"`
+	IsClub    bool   `json:"is_club"`
+	IsCustom  bool   `json:"is_custom"`
+	X         int32  `json:"x"`
+	Y         int32  `json:"y"`
+	Dir       int32  `json:"dir"`
+}
+
+type User struct {
+	ID                 int32       `json:"id"`
+	Username           string      `json:"username"`
+	Password           string      `json:"password"`
+	AuthTicket         string      `json:"auth_ticket"`
+	Email              string      `json:"email"`
+	RankID             int32       `json:"rank_id"`
+	AccountCreatedDate time.Time   `json:"account_created_date"`
+	LastOnlineDate     time.Time   `json:"last_online_date"`
+	IsOnline           bool        `json:"is_online"`
+	Motto              string      `json:"motto"`
+	Look               string      `json:"look"`
+	Gender             UsersGender `json:"gender"`
+	IpRegister         string      `json:"ip_register"`
+	IpCurrent          string      `json:"ip_current"`
+	HomeRoom           int32       `json:"home_room"`
 }

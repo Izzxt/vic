@@ -18,18 +18,16 @@ func (e *RequestNewNavigatorRoomsEvent) Execute(client core.HabboClient, in core
 	category := in.ReadString()
 	search := in.ReadString() // search
 
-	fmt.Println(category)
-	if category == "myworld_view" {
-		client.Send(
-			&navigator.NewNavigatorSearchResultsComposer{
-				SearchCode:  category,
-				SearchQuery: search,
-				NavigatorSearchResults: []navigator.NavigatorSearchResults{
-					{
-						Identifier: "myworld_view", PublicName: "My Rooms",
-					},
-				},
-			},
-		)
-	}
+	fmt.Println(category, search)
+
+	c := client.Navigator()
+
+	results := c.SearchCategory(client, category)
+	client.Send(
+		&navigator.NewNavigatorSearchResultsComposer{
+			SearchCode:             category,
+			SearchQuery:            search,
+			NavigatorSearchResults: results,
+		},
+	)
 }

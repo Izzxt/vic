@@ -9,6 +9,95 @@ import (
 	"context"
 )
 
+const GetActiveRooms = `-- name: GetActiveRooms :many
+SELECT r.id, r.owner_id, r.name, r.description, r.model_id, r.password, r.state, r.users, r.max_users, r.flat_category_id, r.score, r.floorpaper, r.wallpaper, r.landscape, r.wall_thickness, r.wall_height, r.floor_thickness, r.tags, r.is_public, r.is_staff_picked, r.allow_other_pets, r.allow_other_pets_eat, r.allow_walkthrough, r.is_wall_hidden, r.chat_mode, r.chat_weight, r.chat_scrolling_speed, r.chat_hearing_distance, r.chat_protection, r.who_can_mute, r.who_can_kick, r.who_can_ban, r.roller_speed, r.is_promoted, r.trade_mode, r.move_diagonal, r.is_wired_hidden, r.is_forsale, u.id, u.username, u.password, u.auth_ticket, u.email, u.rank_id, u.account_created_date, u.last_online_date, u.is_online, u.motto, u.look, u.gender, u.ip_register, u.ip_current, u.home_room
+FROM rooms as r
+JOIN users as u ON u.id = r.owner_id
+WHERE r.users > 0 ORDER BY r.users DESC
+`
+
+type GetActiveRoomsRow struct {
+	Room Room `json:"room"`
+	User User `json:"user"`
+}
+
+func (q *Queries) GetActiveRooms(ctx context.Context) ([]GetActiveRoomsRow, error) {
+	rows, err := q.db.QueryContext(ctx, GetActiveRooms)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetActiveRoomsRow{}
+	for rows.Next() {
+		var i GetActiveRoomsRow
+		if err := rows.Scan(
+			&i.Room.ID,
+			&i.Room.OwnerID,
+			&i.Room.Name,
+			&i.Room.Description,
+			&i.Room.ModelID,
+			&i.Room.Password,
+			&i.Room.State,
+			&i.Room.Users,
+			&i.Room.MaxUsers,
+			&i.Room.FlatCategoryID,
+			&i.Room.Score,
+			&i.Room.Floorpaper,
+			&i.Room.Wallpaper,
+			&i.Room.Landscape,
+			&i.Room.WallThickness,
+			&i.Room.WallHeight,
+			&i.Room.FloorThickness,
+			&i.Room.Tags,
+			&i.Room.IsPublic,
+			&i.Room.IsStaffPicked,
+			&i.Room.AllowOtherPets,
+			&i.Room.AllowOtherPetsEat,
+			&i.Room.AllowWalkthrough,
+			&i.Room.IsWallHidden,
+			&i.Room.ChatMode,
+			&i.Room.ChatWeight,
+			&i.Room.ChatScrollingSpeed,
+			&i.Room.ChatHearingDistance,
+			&i.Room.ChatProtection,
+			&i.Room.WhoCanMute,
+			&i.Room.WhoCanKick,
+			&i.Room.WhoCanBan,
+			&i.Room.RollerSpeed,
+			&i.Room.IsPromoted,
+			&i.Room.TradeMode,
+			&i.Room.MoveDiagonal,
+			&i.Room.IsWiredHidden,
+			&i.Room.IsForsale,
+			&i.User.ID,
+			&i.User.Username,
+			&i.User.Password,
+			&i.User.AuthTicket,
+			&i.User.Email,
+			&i.User.RankID,
+			&i.User.AccountCreatedDate,
+			&i.User.LastOnlineDate,
+			&i.User.IsOnline,
+			&i.User.Motto,
+			&i.User.Look,
+			&i.User.Gender,
+			&i.User.IpRegister,
+			&i.User.IpCurrent,
+			&i.User.HomeRoom,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const GetRoomById = `-- name: GetRoomById :one
 SELECT id, owner_id, name, description, model_id, password, state, users, max_users, flat_category_id, score, floorpaper, wallpaper, landscape, wall_thickness, wall_height, floor_thickness, tags, is_public, is_staff_picked, allow_other_pets, allow_other_pets_eat, allow_walkthrough, is_wall_hidden, chat_mode, chat_weight, chat_scrolling_speed, chat_hearing_distance, chat_protection, who_can_mute, who_can_kick, who_can_ban, roller_speed, is_promoted, trade_mode, move_diagonal, is_wired_hidden, is_forsale FROM rooms
 WHERE id = ? LIMIT 1
@@ -58,6 +147,95 @@ func (q *Queries) GetRoomById(ctx context.Context, id int32) (Room, error) {
 		&i.IsForsale,
 	)
 	return i, err
+}
+
+const GetRoomsByOwnerId = `-- name: GetRoomsByOwnerId :many
+SELECT r.id, r.owner_id, r.name, r.description, r.model_id, r.password, r.state, r.users, r.max_users, r.flat_category_id, r.score, r.floorpaper, r.wallpaper, r.landscape, r.wall_thickness, r.wall_height, r.floor_thickness, r.tags, r.is_public, r.is_staff_picked, r.allow_other_pets, r.allow_other_pets_eat, r.allow_walkthrough, r.is_wall_hidden, r.chat_mode, r.chat_weight, r.chat_scrolling_speed, r.chat_hearing_distance, r.chat_protection, r.who_can_mute, r.who_can_kick, r.who_can_ban, r.roller_speed, r.is_promoted, r.trade_mode, r.move_diagonal, r.is_wired_hidden, r.is_forsale, u.id, u.username, u.password, u.auth_ticket, u.email, u.rank_id, u.account_created_date, u.last_online_date, u.is_online, u.motto, u.look, u.gender, u.ip_register, u.ip_current, u.home_room
+FROM rooms as r
+JOIN users as u ON u.id = r.owner_id
+WHERE u.id = ?
+`
+
+type GetRoomsByOwnerIdRow struct {
+	Room Room `json:"room"`
+	User User `json:"user"`
+}
+
+func (q *Queries) GetRoomsByOwnerId(ctx context.Context, id int32) ([]GetRoomsByOwnerIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, GetRoomsByOwnerId, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetRoomsByOwnerIdRow{}
+	for rows.Next() {
+		var i GetRoomsByOwnerIdRow
+		if err := rows.Scan(
+			&i.Room.ID,
+			&i.Room.OwnerID,
+			&i.Room.Name,
+			&i.Room.Description,
+			&i.Room.ModelID,
+			&i.Room.Password,
+			&i.Room.State,
+			&i.Room.Users,
+			&i.Room.MaxUsers,
+			&i.Room.FlatCategoryID,
+			&i.Room.Score,
+			&i.Room.Floorpaper,
+			&i.Room.Wallpaper,
+			&i.Room.Landscape,
+			&i.Room.WallThickness,
+			&i.Room.WallHeight,
+			&i.Room.FloorThickness,
+			&i.Room.Tags,
+			&i.Room.IsPublic,
+			&i.Room.IsStaffPicked,
+			&i.Room.AllowOtherPets,
+			&i.Room.AllowOtherPetsEat,
+			&i.Room.AllowWalkthrough,
+			&i.Room.IsWallHidden,
+			&i.Room.ChatMode,
+			&i.Room.ChatWeight,
+			&i.Room.ChatScrollingSpeed,
+			&i.Room.ChatHearingDistance,
+			&i.Room.ChatProtection,
+			&i.Room.WhoCanMute,
+			&i.Room.WhoCanKick,
+			&i.Room.WhoCanBan,
+			&i.Room.RollerSpeed,
+			&i.Room.IsPromoted,
+			&i.Room.TradeMode,
+			&i.Room.MoveDiagonal,
+			&i.Room.IsWiredHidden,
+			&i.Room.IsForsale,
+			&i.User.ID,
+			&i.User.Username,
+			&i.User.Password,
+			&i.User.AuthTicket,
+			&i.User.Email,
+			&i.User.RankID,
+			&i.User.AccountCreatedDate,
+			&i.User.LastOnlineDate,
+			&i.User.IsOnline,
+			&i.User.Motto,
+			&i.User.Look,
+			&i.User.Gender,
+			&i.User.IpRegister,
+			&i.User.IpCurrent,
+			&i.User.HomeRoom,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const ListRooms = `-- name: ListRooms :many
