@@ -26,10 +26,8 @@ func (r *RoomManager) GetRoom(id int32) core.Room {
 	}
 
 	roomInfo := NewRoomInfo(r.ctx).Load(id)
-	room := NewRoom(r.ctx, roomInfo)
-
-	model := r.model.Load(roomInfo.GetModelId())
-	room.SetModel(model)
+	model := NewRoomModels(r.ctx).Load(roomInfo.GetModelId())
+	room := NewRoom(r.ctx, roomInfo, model)
 	rooms[id] = room
 
 	return room
@@ -86,6 +84,5 @@ func (r *RoomManager) Model() core.RoomModel {
 func NewRoomManager(ctx context.Context) core.RoomManager {
 	roomManager := RoomManager{}
 	roomManager.ctx = ctx
-	roomManager.model = NewRoomModels(ctx)
 	return &roomManager
 }

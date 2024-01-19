@@ -98,10 +98,6 @@ type NavigatorSearchResultsSet interface {
 	Compose(compose OutgoingPacket)
 }
 
-type A interface {
-	room_info.GetActiveRoomsRow | room_info.GetRoomsByOwnerIdRow
-}
-
 type OutgoingPacket interface {
 	Writebyte(value byte)
 	WriteShort(value int16)

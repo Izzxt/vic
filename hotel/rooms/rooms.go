@@ -2,6 +2,7 @@ package rooms
 
 import (
 	"context"
+	"sync"
 
 	"github.com/Izzxt/vic/core"
 	habbo_unit "github.com/Izzxt/vic/hotel/habbo/room"
@@ -17,6 +18,8 @@ type Room struct {
 	isLoaded bool
 	counter  int32
 	habbos   []core.Habbo
+
+	mu sync.RWMutex
 }
 
 // GetHabbos implements core.IRoom.
@@ -31,7 +34,9 @@ func (r *Room) TileMap() core.RoomTileMap {
 
 // SetModel implements core.IRoom.
 func (r *Room) SetModel(model core.RoomModel) {
+	r.mu.Lock()
 	r.model = model
+	r.mu.Unlock()
 }
 
 // SuccessEnterRoom implements core.IRoom.
@@ -146,6 +151,9 @@ func (r *Room) LoadRoom() {
 
 // Model implements core.IRoom.
 func (r *Room) Model() core.RoomModel {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
 	return r.model
 }
 
@@ -154,11 +162,13 @@ func (r *Room) Info() core.RoomInfo {
 	return r.info
 }
 
-func NewRoom(ctx context.Context, roomInfo core.RoomInfo) core.Room {
+func NewRoom(ctx context.Context, roomInfo core.RoomInfo, model core.RoomModel) core.Room {
 	room := Room{}
 	room.info = roomInfo
 	room.isLoaded = false
 	room.counter = 0
+	room.model = model
+	room.mu = sync.RWMutex{}
 	room.habbos = make([]core.Habbo, 0)
 	return &room
 }

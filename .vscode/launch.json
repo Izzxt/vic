@@ -13,7 +13,8 @@
         "--check-go-version=false",
         "--race",
       ],
-      "program": "${workspaceFolder}/cmd/main.go"
+      "program": "${workspaceFolder}/cmd/main.go",
+      "console": "integratedTerminal"
     }
   ]
 }
