@@ -38,6 +38,10 @@ func (v *Vic) Init() {
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
 	}
+	defer func() {
+		sql.Close()
+		fmt.Println("Shutting down databases...")
+	}()
 
 	database.Init(sql)
 
@@ -61,7 +65,9 @@ func (v *Vic) Init() {
 		<-time.After(1 * time.Second)
 		fmt.Println("Shutting down...")
 
+		fmt.Println("Shutting down rooms...")
 		room.Shutdown()
+		fmt.Println("Shutting down networking...")
 		if err := net.Shutdown(); err != nil {
 			fmt.Printf("Error shutting down websocket: %v\n", err)
 		}
@@ -71,7 +77,7 @@ func (v *Vic) Init() {
 
 	if err := net.StartWS(); err != nil {
 		if websocket.IsCloseError(err, websocket.CloseGoingAway) {
-			fmt.Println("Shutting down...")
+			fmt.Println("Shut down.")
 		} else {
 			fmt.Printf("Error starting websocket: %v\n", err)
 		}

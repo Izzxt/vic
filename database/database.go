@@ -28,6 +28,7 @@ type Queries interface {
 	NavigatorFlatCategories() navigator_flat_cats.Querier
 	NavigatorPublicCategories() navigator_public_cats.Querier
 	BubblesChat() bubbles_chat.Querier
+	Close() error
 }
 
 type database struct {
@@ -77,6 +78,10 @@ func (db *database) BubblesChat() bubbles_chat.Querier {
 
 func GetInstance() Queries {
 	return instance
+}
+
+func (db *database) Close() error {
+	return db.Close()
 }
 
 func Init(db *sql.DB) Queries {
