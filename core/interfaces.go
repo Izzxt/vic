@@ -67,6 +67,7 @@ type HabboClient interface {
 	SetNavigator(NavigatorManager)
 	Room() RoomManager
 	SetRoom(RoomManager)
+	SendAlert(string)
 }
 
 type Networking interface {

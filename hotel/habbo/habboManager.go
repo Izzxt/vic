@@ -2,9 +2,9 @@ package habbo
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
@@ -24,7 +24,8 @@ func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client cor
 	habbo := loadHabbo(ctx, authTicket, client)
 
 	if h, ok := connectedClients[int(habbo.HabboInfo().ID)]; ok {
-		fmt.Printf("Habbo already logged in: %v\n", h.HabboInfo().Username)
+		h.Client().SendAlert("You have logged in from another location.")
+		time.Sleep(1 * time.Second)
 		h.Client().Connection().Close()
 		delete(connectedClients, int(h.HabboInfo().ID))
 	}

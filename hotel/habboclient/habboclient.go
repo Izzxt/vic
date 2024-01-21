@@ -2,20 +2,22 @@ package habboclient
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"sync"
 
 	"github.com/Izzxt/vic/codec"
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/messages"
+	"github.com/Izzxt/vic/packets/outgoing/notifications"
 	"github.com/gorilla/websocket"
 )
+
+var clients map[*websocket.Conn]core.HabboClient
 
 type habboClient struct {
 	ctx  context.Context
 	conn *websocket.Conn
 
-	clients   map[*websocket.Conn]core.HabboClient
 	clientsMu sync.RWMutex
 
 	outgoing chan core.OutgoingMessage
@@ -96,7 +98,7 @@ func (h *habboClient) SendToRoom(room core.Room, out core.OutgoingMessage) {
 // AddClient implements core.HabboClient.
 func (h *habboClient) AddClient(conn *websocket.Conn) {
 	h.clientsMu.Lock()
-	h.clients[conn] = h
+	clients[conn] = h
 	h.clientsMu.Unlock()
 }
 
@@ -114,6 +116,11 @@ func (h *habboClient) Listen() {
 // Send implements core.HabboClient.
 func (h *habboClient) Send(out core.OutgoingMessage) {
 	h.outgoing <- out
+}
+
+// SendAlert implements core.HabboClient.
+func (h *habboClient) SendAlert(message string) {
+	h.Send(&notifications.AlertComposer{Message: message})
 }
 
 func (h *habboClient) readMessage() {
@@ -142,19 +149,20 @@ func (h *habboClient) readMessage() {
 	}
 }
 
-func (h *habboClient) Close() {
+func (h *habboClient) Dispose() {
+	if h.habbo == nil {
+		return
+	}
 	if h.habbo.Room() != nil {
 		h.habbo.Room().LeaveRoom(h.habbo, true)
 	}
-	delete(h.clients, h.conn)
-	h.conn.Close()
 }
 
 func (h *habboClient) writeMessage() {
 	for {
 		select {
 		case <-h.done:
-			h.Close()
+			h.Dispose()
 			return
 		case out := <-h.outgoing:
 			bytes := make([]byte, 6)
@@ -163,7 +171,7 @@ func (h *habboClient) writeMessage() {
 			bytes = codec.Encode(outgoingPacket.GetHeader(), compose.GetBytes())
 			err := h.conn.WriteMessage(websocket.BinaryMessage, bytes)
 			if err != nil {
-				log.Fatalf("Error sending packet: %v", err)
+				fmt.Printf("Error sending packet: %v", err)
 			}
 		}
 	}
@@ -183,7 +191,7 @@ func NewHabboClient(ctx context.Context, conn *websocket.Conn,
 
 	outgoing := make(chan core.OutgoingMessage, 100)
 	done := make(chan struct{})
-	clients := make(map[*websocket.Conn]core.HabboClient)
+	clients = make(map[*websocket.Conn]core.HabboClient)
 
 	return &habboClient{
 		ctx:        ctx,
@@ -192,6 +200,5 @@ func NewHabboClient(ctx context.Context, conn *websocket.Conn,
 		done:       done,
 		messages:   messages,
 		networking: networking,
-		clients:    clients,
 	}
 }
