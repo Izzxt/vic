@@ -11,14 +11,12 @@ import (
 	habbo_composer "github.com/Izzxt/vic/packets/outgoing/habbo"
 	"github.com/Izzxt/vic/packets/outgoing/handshake"
 	"github.com/Izzxt/vic/packets/outgoing/navigator"
-	"github.com/gorilla/websocket"
 )
 
 type manager struct{ ctx context.Context }
 
 var (
 	connectedClients             = make(map[int]core.Habbo)
-	Habbos                       = make(map[*websocket.Conn]core.Habbo)
 	mu               *sync.Mutex = &sync.Mutex{}
 )
 
@@ -27,8 +25,8 @@ func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client cor
 
 	if h, ok := connectedClients[int(habbo.HabboInfo().ID)]; ok {
 		fmt.Printf("Habbo already logged in: %v\n", h.HabboInfo().Username)
-		delete(connectedClients, int(h.HabboInfo().ID))
 		h.Client().Connection().Close()
+		delete(connectedClients, int(h.HabboInfo().ID))
 	}
 	client.SetHabbo(habbo)
 	connectedClients[int(habbo.HabboInfo().ID)] = habbo

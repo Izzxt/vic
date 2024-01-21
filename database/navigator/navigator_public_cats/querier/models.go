@@ -5,6 +5,7 @@
 package navigator_public_cats
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
@@ -96,6 +97,14 @@ func (ns NullUsersGender) Value() (driver.Value, error) {
 	return string(ns.UsersGender), nil
 }
 
+type BubblesChat struct {
+	ID                      int32  `json:"id"`
+	Key                     string `json:"key"`
+	IsAmbassador            bool   `json:"is_ambassador"`
+	IsOverrideable          bool   `json:"is_overrideable"`
+	TriggerTalkingFurniture bool   `json:"trigger_talking_furniture"`
+}
+
 type NavigatorFlatCat struct {
 	ID          int32  `json:"id"`
 	MinRank     int32  `json:"min_rank"`
@@ -183,4 +192,10 @@ type User struct {
 	IpRegister         string      `json:"ip_register"`
 	IpCurrent          string      `json:"ip_current"`
 	HomeRoom           int32       `json:"home_room"`
+}
+
+type UsersStat struct {
+	ID           uint64        `json:"id"`
+	UserID       int32         `json:"user_id"`
+	BubbleChatID sql.NullInt32 `json:"bubble_chat_id"`
 }

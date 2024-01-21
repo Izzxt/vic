@@ -6,6 +6,7 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	users "github.com/Izzxt/vic/database/users/querier"
+	users_stats "github.com/Izzxt/vic/database/users/stats/querier"
 )
 
 type habbo struct {
@@ -14,6 +15,7 @@ type habbo struct {
 	client    core.HabboClient
 	room      core.Room
 	roomUnit  core.HabboRoomUnit
+	stats     core.HabboStats
 
 	mu sync.RWMutex
 }
@@ -44,6 +46,13 @@ func (h *habbo) HabboInfo() users.User {
 	return h.habboInfo
 }
 
+func (h *habbo) HabboStats() core.HabboStats {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	return h.stats
+}
+
 // RoomUnit implements core.IHabbo.
 func (h *habbo) RoomUnit() core.HabboRoomUnit {
 	h.mu.RLock()
@@ -60,5 +69,8 @@ func (h *habbo) SetRoomUnit(roomUnit core.HabboRoomUnit) {
 }
 
 func NewHabbo(ctx context.Context, users users.User, client core.HabboClient) core.Habbo {
-	return &habbo{ctx: ctx, habboInfo: NewHabboInfo(ctx, users).User, client: client}
+	return &habbo{
+		ctx: ctx, habboInfo: NewHabboInfo(ctx, users).User, client: client,
+		stats: NewHabboStats(ctx, users_stats.UsersStat{}).Load(users.ID),
+	}
 }

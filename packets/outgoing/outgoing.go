@@ -41,10 +41,14 @@ const (
 	RoomCreatedComposer    = 1304
 
 	// Room Unit
-	RoomUnitComposer       = 374
-	RoomUnitStatusComposer = 1640
-	RoomUnitInfoComposer   = 3920
-	RoomUnitRemoveComposer = 2661
+	RoomUnitComposer            = 374
+	RoomUnitStatusComposer      = 1640
+	RoomUnitInfoComposer        = 3920
+	RoomUnitRemoveComposer      = 2661
+	RoomUserTypingComposer      = 1717
+	RoomUnitChatComposer        = 1446
+	RoomUnitChatShoutComposer   = 1036
+	RoomUnitChatWhisperComposer = 2704
 
 	// Unknown
 	IgnoredUsersComposer = 126

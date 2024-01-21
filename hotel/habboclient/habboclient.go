@@ -142,11 +142,19 @@ func (h *habboClient) readMessage() {
 	}
 }
 
+func (h *habboClient) Close() {
+	if h.habbo.Room() != nil {
+		h.habbo.Room().LeaveRoom(h.habbo, true)
+	}
+	delete(h.clients, h.conn)
+	h.conn.Close()
+}
+
 func (h *habboClient) writeMessage() {
 	for {
 		select {
 		case <-h.done:
-			h.done <- struct{}{}
+			h.Close()
 			return
 		case out := <-h.outgoing:
 			bytes := make([]byte, 6)

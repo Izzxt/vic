@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.24.0
 
-package room_models
+package bubbles_chat
 
 import (
 	"database/sql"

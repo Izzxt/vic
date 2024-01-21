@@ -23,6 +23,7 @@ import (
 type Vic struct {
 	Navigator core.NavigatorManager
 	Room      core.RoomManager
+	Dsn       string
 }
 
 var (
@@ -33,7 +34,7 @@ var (
 
 func (v *Vic) Init() {
 	ctx := context.Background()
-	sql, err := sql.Open("mysql", "root:root@tcp(localhost:49152)/vic?parseTime=true")
+	sql, err := sql.Open("mysql", v.Dsn)
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
 	}

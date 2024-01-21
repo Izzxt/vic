@@ -39,5 +39,10 @@ const (
 	RoomCreateEvent           = 2752
 
 	// Room unit
-	RoomUnitWalkEvent = 3320
+	RoomUnitWalkEvent        = 3320
+	RoomUserStartTypingEvent = 1597
+	RoomUserStopTypingEvent  = 1474
+	RoomUnitChatEvent        = 1314
+	RoomUnitChatShoutEvent   = 2085
+	RoomUnitChatWhisperEvent = 1543
 )

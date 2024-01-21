@@ -108,6 +108,16 @@ func (r *Room) GetHabbo(id int32) core.Habbo {
 	return nil
 }
 
+// GetHabboByName implements core.IRoom.
+func (r *Room) GetHabboByName(name string) core.Habbo {
+	for _, habbo := range r.habbos {
+		if habbo.HabboInfo().Username == name {
+			return habbo
+		}
+	}
+	return nil
+}
+
 func (r *Room) RemoveHabbo(habbo core.Habbo) {
 	for i, h := range r.habbos {
 		if h.HabboInfo().ID == habbo.HabboInfo().ID {

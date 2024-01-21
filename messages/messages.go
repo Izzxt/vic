@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/Izzxt/vic/core"
@@ -10,6 +11,7 @@ import (
 	"github.com/Izzxt/vic/packets/incoming/navigator"
 	"github.com/Izzxt/vic/packets/incoming/room"
 	room_units "github.com/Izzxt/vic/packets/incoming/room/units"
+	room_chat "github.com/Izzxt/vic/packets/incoming/room/units/chats"
 )
 
 type messages struct {
@@ -64,6 +66,11 @@ func (m *messages) RegisterMessages() {
 
 	// Room unit
 	m.RegisterIncomingMessage(incoming.RoomUnitWalkEvent, &room_units.RoomUnitWalkEvent{})
+	m.RegisterIncomingMessage(incoming.RoomUserStartTypingEvent, &room_chat.RoomUserStartTypingEvent{})
+	m.RegisterIncomingMessage(incoming.RoomUserStopTypingEvent, &room_chat.RoomUserStopTypingEvent{})
+	m.RegisterIncomingMessage(incoming.RoomUnitChatEvent, &room_chat.RoomUnitChatEvent{})
+	m.RegisterIncomingMessage(incoming.RoomUnitChatShoutEvent, &room_chat.RoomUnitChatEvent{})
+	m.RegisterIncomingMessage(incoming.RoomUnitChatWhisperEvent, &room_chat.RoomUnitChatEvent{})
 }
 
 // HandleMessages implements core.IMessages.
@@ -73,7 +80,7 @@ func (m *messages) HandleMessages(client core.HabboClient, packet core.IncomingP
 	if message, ok := incomingMessages[packet.GetHeader()]; ok {
 		message.Execute(client, packet)
 	} else {
-		// fmt.Printf("Message %d not handled\n", packet.GetHeader())
+		fmt.Printf("Message %d not handled\n", packet.GetHeader())
 	}
 }
 

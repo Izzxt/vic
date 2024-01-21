@@ -12,6 +12,7 @@ import (
 
 	users "github.com/Izzxt/vic/database/users/querier"
 
+	bubbles_chat "github.com/Izzxt/vic/database/rooms/bubbles_chat/querier"
 	room_info "github.com/Izzxt/vic/database/rooms/room_info/querier"
 )
 
@@ -22,6 +23,13 @@ type Habbo interface {
 	Client() HabboClient
 	RoomUnit() HabboRoomUnit
 	SetRoomUnit(HabboRoomUnit)
+	HabboStats() HabboStats
+}
+
+type HabboStats interface {
+	Context() context.Context
+	Load(int32) HabboStats
+	UpdateBubbleChat(int32)
 }
 
 type NoobnessLevel int
@@ -146,6 +154,7 @@ type Room interface {
 	TileMap() RoomTileMap
 	GetHabbos() []Habbo
 	GetHabbo(int32) Habbo
+	GetHabboByName(string) Habbo
 }
 
 type RoomTileMap interface {
@@ -241,4 +250,13 @@ type RoomInfo interface {
 	GetIsWiredHidden() bool
 	GetIsForsale() bool
 	Owner() room_info.User
+}
+
+type ChatMessage interface {
+	SendMessage()
+}
+
+type BubblesChat interface {
+	GetBubbleChatById(int32) *bubbles_chat.BubblesChat
+	GetBubbleChatByKey(string) *bubbles_chat.BubblesChat
 }

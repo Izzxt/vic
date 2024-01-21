@@ -1,8 +1,16 @@
 package main
 
-import "github.com/Izzxt/vic"
+import (
+	"github.com/Izzxt/vic"
+)
 
 func main() {
-	vic := vic.Vic{}
+
+	dsn := "root:root@tcp(localhost:49152)/vic?parseTime=true"
+
+	vic := vic.Vic{
+		Dsn: dsn,
+	}
 	vic.Init()
+
 }

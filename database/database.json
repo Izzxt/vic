@@ -20,6 +20,23 @@
     },
     {
       "engine": "mysql",
+      "queries": "users/stats/query.sql",
+      "schema": "schema.sql",
+      "gen": {
+        "go": {
+          "package": "users_stats",
+          "out": "users/stats/querier",
+          "emit_exported_queries": true,
+          "emit_interface": true,
+          "emit_empty_slices": true,
+          "emit_json_tags": true,
+          "json_tags_case_style": "snake",
+          "emit_pointers_for_null_types": true
+        }
+      }
+    },
+    {
+      "engine": "mysql",
       "queries": "navigator/navigator_flat_cats/query.sql",
       "schema": "schema.sql",
       "gen": {
@@ -60,6 +77,23 @@
         "go": {
           "package": "room_info",
           "out": "rooms/room_info/querier",
+          "emit_exported_queries": true,
+          "emit_interface": true,
+          "emit_empty_slices": true,
+          "emit_json_tags": true,
+          "json_tags_case_style": "snake",
+          "emit_pointers_for_null_types": true
+        }
+      }
+    },
+    {
+      "engine": "mysql",
+      "queries": "rooms/bubbles_chat/query.sql",
+      "schema": "schema.sql",
+      "gen": {
+        "go": {
+          "package": "bubbles_chat",
+          "out": "rooms/bubbles_chat/querier",
           "emit_exported_queries": true,
           "emit_interface": true,
           "emit_empty_slices": true,
