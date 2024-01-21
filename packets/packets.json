@@ -1,0 +1,14 @@
+[
+  {
+    "type": "outgoing",
+    "name": "AlertComposer",
+    "packageName": "notifications",
+    "path": "notifications"
+  },
+  {
+    "type": "outgoing",
+    "name": "SimpleAlertComposer",
+    "packageName": "notifications",
+    "path": "notifications"
+  }
+]
