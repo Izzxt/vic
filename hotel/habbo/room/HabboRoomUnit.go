@@ -69,7 +69,7 @@ func (h *habboRoomUnit) SetPreviousTile(tile core.RoomTile) {
 
 // WalkTo implements core.IHabboRoomUnit.
 func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.RoomTile, client core.HabboClient) {
-	if h.room == nil {
+	if h.Room() == nil || h.Habbo() == nil {
 		return
 	}
 
@@ -83,7 +83,13 @@ func (h *habboRoomUnit) WalkTo(ctx context.Context, tile core.RoomTile, client c
 
 		delay := 500 * time.Millisecond
 		h.ticker = PereodicallyDo(ctx, delay, func(ctx context.Context, ticker *time.Ticker, _ time.Time, wg *sync.WaitGroup) {
+			if h.Room() == nil || h.Habbo() == nil || h.Room().TileMap() == nil {
+				h.stopWalking(cancel)
+				return
+			}
+
 			defer wg.Done()
+
 			h.goalPath = h.Room().TileMap().FindPath(h.currentTile, h.goalTile).Pop()
 
 			next := h.goalPath.Last()

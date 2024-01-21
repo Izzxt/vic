@@ -55,6 +55,10 @@ func (c *RoomUnitStatusComposer) Compose(compose core.OutgoingPacket) core.Outgo
 		compose.WriteInt(int32(len(c.Habbos)))
 		for _, habbo := range c.Habbos {
 			habbo := habbo.(core.Habbo)
+			if habbo.RoomUnit() == nil {
+				continue
+			}
+
 			compose.WriteInt(habbo.RoomUnit().ID())
 
 			compose.WriteInt(habbo.RoomUnit().PreviousTile().GetX())
