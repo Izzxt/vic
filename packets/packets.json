@@ -1,13 +1,22 @@
 [
   {
+    "header": 3801,
     "type": "outgoing",
     "name": "AlertComposer",
     "packageName": "notifications",
     "path": "notifications"
   },
   {
+    "header": 5100,
     "type": "outgoing",
     "name": "SimpleAlertComposer",
+    "packageName": "notifications",
+    "path": "notifications"
+  },
+  {
+    "header": 1992,
+    "type": "outgoing",
+    "name": "NotificationDialogComposer",
     "packageName": "notifications",
     "path": "notifications"
   }

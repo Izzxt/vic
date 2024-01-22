@@ -12,6 +12,7 @@ type data struct {
 	Name        string `json:"name"`
 	PackageName string `json:"packageName"`
 	Path        string `json:"path"`
+	Header      uint16 `json:"header"`
 }
 
 func main() {
@@ -22,12 +23,24 @@ func main() {
 		panic(err)
 	}
 
-	json.Unmarshal(file, &d)
+	if err := json.Unmarshal(file, &d); err != nil {
+		panic(err)
+	}
 
 	for _, v := range d {
 		if checkFileExists(filepath.Join(wd, "packets", v.Type, v.Path, v.Name+".go")) {
 			continue
 		}
+
+		file, err := os.OpenFile(filepath.Join(wd, "packets", v.Type, v.Type+".go"), os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		ht := template.Must(template.New("packet-header").Parse(headerTmpt))
+		ht.Execute(file, v)
+
+		file.Close()
 
 		if err := os.MkdirAll(filepath.Join(wd, "packets", v.Type, v.Path), os.ModePerm); err != nil {
 			panic(err)
@@ -53,6 +66,8 @@ func checkFileExists(filename string) bool {
 	return true
 }
 
+var headerTmpt = `const {{.Name}} = {{.Header}}`
+
 var tmpt = `{{if eq .Type "incoming"}}
 package {{.PackageName}}
 {{else if eq .Type "outgoing"}}
@@ -65,13 +80,16 @@ import (
 
 type {{.Name}} struct {}
 {{if eq .Type "incoming"}}
-func (*{{.Name}}) Execute(client core.HabboClient, in core.IncomingPacket) {}
+func (*{{.Name}}) Execute(client core.HabboClient, in core.IncomingPacket) {
+	// TODO: implement me
+}
 {{else if eq .Type "outgoing"}}
 func (*{{.Name}}) GetId() uint16 {
 	return outgoing.{{.Name}}
 }
 
 func (c *{{.Name}}) Compose(compose core.OutgoingPacket) core.OutgoingPacket {
+	// TODO: implement me
 	return compose
 }
 {{end}}
