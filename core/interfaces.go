@@ -274,3 +274,8 @@ type CommandManager interface {
 	Register(string, Command)
 	RegisterCommands()
 }
+
+type PluginManager interface {
+	LoadPlugin()
+	UnloadPlugin()
+}
