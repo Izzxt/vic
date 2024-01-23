@@ -68,6 +68,7 @@ type HabboClient interface {
 	Room() RoomManager
 	SetRoom(RoomManager)
 	SendAlert(string)
+	SendMOTDMessage(...string)
 }
 
 type Networking interface {
@@ -260,4 +261,16 @@ type ChatMessage interface {
 type BubblesChat interface {
 	GetBubbleChatById(int32) *bubbles_chat.BubblesChat
 	GetBubbleChatByKey(string) *bubbles_chat.BubblesChat
+}
+
+type Command interface {
+	Execute(HabboClient, []string)
+}
+
+type CommandManager interface {
+	Get(string) Command
+	Exists(string) bool
+	HandleCommand(HabboClient, string)
+	Register(string, Command)
+	RegisterCommands()
 }

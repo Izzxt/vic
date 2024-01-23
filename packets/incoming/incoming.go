@@ -1,48 +1,46 @@
 package incoming
 
-const (
-	ReleaseVersionEvent = 4000
-	SecureLoginEvent    = 2419 // 1989
-	UniqueIdEvent       = 2490 // 3521
-	VersionCheckEvent   = 1053 // 1220
-	PingEvent           = 295  // 878
-	PongEvent           = 2596
+const ReleaseVersionEvent = 4000
+const SecureLoginEvent = 2419  // 1989
+const UniqueIdEvent = 2490     // 3521
+const VersionCheckEvent = 1053 // 1220
+const PingEvent = 295          // 878
+const PongEvent = 2596
 
-	// users
-	RequestUserDataEvent       = 357 // 2629
-	RequestUserCreditsEvent    = 273 // 1051
-	RequestUserClubEvent       = 3166
-	RequestMeMenuSettingsEvent = 2388
-	UsernameEvent              = 3878
-	UserFigure                 = 2730
+// users
+const RequestUserDataEvent = 357    // 2629
+const RequestUserCreditsEvent = 273 // 1051
+const RequestUserClubEvent = 3166
+const RequestMeMenuSettingsEvent = 2388
+const UsernameEvent = 3878
+const UserFigure = 2730
 
-	// Navigator
-	NewNavigatorEvent             = 2110 // 3375 navigator
-	RequestRoomCategoriesEvent    = 3027
-	RequestNewNavigatorRoomsEvent = 249
+// Navigator
+const NewNavigatorEvent = 2110 // 3375 navigator
+const RequestRoomCategoriesEvent = 3027
+const RequestNewNavigatorRoomsEvent = 249
 
-	EventTrackerEvent = 3457 // 143
+const EventTrackerEvent = 3457 // 143
 
-	// Hotel view
-	RequestHotelViewBonusRareEvent = 957
-	HotelViewDataEvent             = 2912
+// Hotel view
+const RequestHotelViewBonusRareEvent = 957
+const HotelViewDataEvent = 2912
 
-	// Friends
-	RequestFriendsEvent     = 1523
-	RequestInitFriendsEvent = 2781
+// Friends
+const RequestFriendsEvent = 1523
+const RequestInitFriendsEvent = 2781
 
-	// Room
-	RequestRoomDataEvent      = 2230
-	RequestRoomLoadEvent      = 2312
-	RequestRoomHeightmapEvent = 3898
-	RequestHeightmapEvent     = 2300
-	RoomCreateEvent           = 2752
+// Room
+const RequestRoomDataEvent = 2230
+const RequestRoomLoadEvent = 2312
+const RequestRoomHeightmapEvent = 3898
+const RequestHeightmapEvent = 2300
+const RoomCreateEvent = 2752
 
-	// Room unit
-	RoomUnitWalkEvent        = 3320
-	RoomUserStartTypingEvent = 1597
-	RoomUserStopTypingEvent  = 1474
-	RoomUnitChatEvent        = 1314
-	RoomUnitChatShoutEvent   = 2085
-	RoomUnitChatWhisperEvent = 1543
-)
+// Room unit
+const RoomUnitWalkEvent = 3320
+const RoomUserStartTypingEvent = 1597
+const RoomUserStopTypingEvent = 1474
+const RoomUnitChatEvent = 1314
+const RoomUnitChatShoutEvent = 2085
+const RoomUnitChatWhisperEvent = 1543

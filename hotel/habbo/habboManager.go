@@ -24,7 +24,7 @@ func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client cor
 	habbo := loadHabbo(ctx, authTicket, client)
 
 	if h, ok := connectedClients[int(habbo.HabboInfo().ID)]; ok {
-		h.Client().SendAlert("You have logged in from another location.")
+		h.Client().SendAlert("You have logged in from somewhere else.")
 		time.Sleep(1 * time.Second)
 		h.Client().Connection().Close()
 		delete(connectedClients, int(h.HabboInfo().ID))
@@ -33,6 +33,10 @@ func LoginHabboWithAuthTicket(ctx context.Context, authTicket string, client cor
 	connectedClients[int(habbo.HabboInfo().ID)] = habbo
 
 	log.Printf("Habbo logged in: %v", habbo.HabboInfo().Username)
+	// TODO: update habbo last login
+	// TODO: update habbo last ip
+	// TODO: update machine id
+	// TODO: update online status
 
 	client.Send(&handshake.SecureLoginOKComposer{})
 	client.Send(&navigator.NavigatorSettingsComposer{HomeRoomId: 0, RoomId: 0})

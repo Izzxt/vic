@@ -19,5 +19,12 @@
     "name": "NotificationDialogComposer",
     "packageName": "notifications",
     "path": "notifications"
+  },
+  {
+    "header": 2035,
+    "type": "outgoing",
+    "name": "MOTDComposer",
+    "packageName": "notifications",
+    "path": "notifications"
   }
 ]

@@ -123,6 +123,11 @@ func (h *habboClient) SendAlert(message string) {
 	h.Send(&notifications.AlertComposer{Message: message})
 }
 
+// SendMOTDMessage implements core.HabboClient.
+func (h *habboClient) SendMOTDMessage(messages ...string) {
+	h.Send(&notifications.MOTDComposer{Messages: messages})
+}
+
 func (h *habboClient) readMessage() {
 	for {
 		select {
@@ -185,9 +190,9 @@ func (h *habboClient) Connection() *websocket.Conn {
 func NewHabboClient(ctx context.Context, conn *websocket.Conn,
 	messages core.Messages, networking core.Networking,
 ) core.HabboClient {
-	if conn == nil {
-		panic("conn cannot be nil")
-	}
+	// if conn == nil {
+	// 	panic("conn cannot be nil")
+	// }
 
 	outgoing := make(chan core.OutgoingMessage, 100)
 	done := make(chan struct{})

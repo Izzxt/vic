@@ -1,55 +1,57 @@
 package outgoing
 
-const (
-	UserCreditsComposer    = 3475 // 1958
-	UserCurrencyComposer   = 2018
-	UserDataComposer       = 2725 // 845
-	UserPerksComposer      = 2586
-	MeMenuSettingsComposer = 513
-	UserFigureComposer     = 2429
-	NoobnessLevelComposer  = 3738
+const UserCreditsComposer = 3475 // 1958
+const UserCurrencyComposer = 2018
+const UserDataComposer = 2725 // 845
+const UserPerksComposer = 2586
+const MeMenuSettingsComposer = 513
+const UserFigureComposer = 2429
+const NoobnessLevelComposer = 3738
 
-	AvailabilityStatusComposer = 2033 // 3690
-	PingComposer               = 3928 // 942
-	PongComposer               = 10
-	SecureLoginOKComposer      = 2491 // 1079
-	SetUniqueIdComposer        = 1488 // 3731
+const AvailabilityStatusComposer = 2033 // 3690
+const PingComposer = 3928               // 942
+const PongComposer = 10
+const SecureLoginOKComposer = 2491 // 1079
+const SetUniqueIdComposer = 1488   // 3731
 
-	NavigatorMetaParserComposer = 3052 // 1071 navigator
-	NavigatorRoomsComposer      = 3104 // 1568 navigator
-	// NavigatorRoomsComposer               = 3244 // 1568 navigator
-	NavigatorCollapsedCategoriesComposer = 1543 // 232 navigator
-	NavigatorPrefComposer                = 518  // 3617 navigator
-	NavigatorSettingsComposer            = 2875 // 2477
-	RoomCategoriesComposer               = 1562
-	NewNavigatorSearchResultsComposer    = 2690
+const NavigatorMetaParserComposer = 3052          // 1071 navigator
+const NavigatorRoomsComposer = 3104               // 1568 navigator
+const NavigatorCollapsedCategoriesComposer = 1543 // 232 navigator
+const NavigatorPrefComposer = 518                 // 3617 navigator
+const NavigatorSettingsComposer = 2875            // 2477
+const RoomCategoriesComposer = 1562
+const NewNavigatorSearchResultsComposer = 2690
 
-	// Hotel view
-	BonusRareComposer     = 1533
-	HotelViewDataComposer = 1745
+// Hotel view
+const BonusRareComposer = 1533
+const HotelViewDataComposer = 1745
 
-	// Room
-	RoomDataComposer       = 687
-	RoomOpenComposer       = 758
-	RoomModelComposer      = 2031
-	RelativeMapComposer    = 2753
-	HeightMapComposer      = 1301
-	RoomRightsComposer     = 780
-	RoomUserDataComposer   = 3920
-	RoomUserStatusComposer = 1640
-	RoomOwnerComposer      = 339
-	RoomCreatedComposer    = 1304
+// Room
+const RoomDataComposer = 687
+const RoomOpenComposer = 758
+const RoomModelComposer = 2031
+const RelativeMapComposer = 2753
+const HeightMapComposer = 1301
+const RoomRightsComposer = 780
+const RoomUserDataComposer = 3920
+const RoomUserStatusComposer = 1640
+const RoomOwnerComposer = 339
+const RoomCreatedComposer = 1304
 
-	// Room Unit
-	RoomUnitComposer            = 374
-	RoomUnitStatusComposer      = 1640
-	RoomUnitInfoComposer        = 3920
-	RoomUnitRemoveComposer      = 2661
-	RoomUserTypingComposer      = 1717
-	RoomUnitChatComposer        = 1446
-	RoomUnitChatShoutComposer   = 1036
-	RoomUnitChatWhisperComposer = 2704
+const AlertComposer = 3801
+const SimpleAlertComposer = 5100
 
-	// Unknown
-	IgnoredUsersComposer = 126
-)
+// Room Unit
+const RoomUnitComposer = 374
+const RoomUnitStatusComposer = 1640
+const RoomUnitInfoComposer = 3920
+const RoomUnitRemoveComposer = 2661
+const RoomUserTypingComposer = 1717
+const RoomUnitChatComposer = 1446
+const RoomUnitChatShoutComposer = 1036
+const RoomUnitChatWhisperComposer = 2704
+
+// Unknown
+const IgnoredUsersComposer = 126
+const NotificationDialogComposer = 1992
+const MOTDComposer = 2035
