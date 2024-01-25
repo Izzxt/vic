@@ -12,6 +12,7 @@ import (
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/database"
+	"github.com/Izzxt/vic/extensions"
 	nv "github.com/Izzxt/vic/hotel/navigator"
 	"github.com/Izzxt/vic/hotel/rooms"
 	"github.com/Izzxt/vic/messages"
@@ -34,6 +35,11 @@ var (
 
 func (v *Vic) Init() {
 	ctx := context.Background()
+
+	plugin := extensions.NewPluginManager()
+
+	// plugin.StartPlugin()
+
 	sql, err := sql.Open("mysql", v.Dsn)
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
@@ -41,6 +47,9 @@ func (v *Vic) Init() {
 	defer func() {
 		sql.Close()
 		fmt.Println("Shutting down databases...")
+
+		fmt.Println("Shutting down plugins...")
+		plugin.UnloadPlugin()
 	}()
 
 	database.Init(sql)
@@ -54,9 +63,11 @@ func (v *Vic) Init() {
 	m := messages.NewMessages()
 	m.RegisterMessages()
 
-	net = networking.NewNetworking(context.Background(), host, port, m, navigator, room)
+	net = networking.NewNetworking(ctx, host, port, m, navigator, room, plugin)
 
 	shutCtx, cancel := context.WithCancel(ctx)
+
+	plugin.LoadPlugin()
 
 	go func() {
 		c := make(chan os.Signal, 1)

@@ -278,4 +278,20 @@ type CommandManager interface {
 type PluginManager interface {
 	LoadPlugin()
 	UnloadPlugin()
+	StartPlugin()
+	SetClient(HabboClient)
+}
+
+type Plugin interface {
+	OnStart()
+	OnLoad()
+	OnUnload()
+}
+
+type PluginConfig interface {
+	GetName() string
+	GetVersion() string
+	GetAuthor() string
+	GetDescription() string
+	LoadConfigFile([]byte) (PluginConfig, error)
 }

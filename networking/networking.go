@@ -10,17 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type networking struct {
-	ctx  context.Context
-	host string
-	port int
-
-	messages  core.Messages
-	navigator core.NavigatorManager
-	room      core.RoomManager
-	server    *http.Server
-}
-
 // Run implements Networking.
 func (n *networking) StartWS() error {
 	fmt.Println("Starting networking...")
@@ -33,6 +22,7 @@ func (n *networking) StartWS() error {
 
 		client := habboclient.NewHabboClient(n.ctx, conn, n.messages, n)
 		client.AddClient(conn)
+		n.plugin.SetClient(client)
 
 		client.SetNavigator(n.navigator)
 		client.SetRoom(n.room)
@@ -57,10 +47,23 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     websocket.IsWebSocketUpgrade,
 }
 
+type networking struct {
+	ctx  context.Context
+	host string
+	port int
+
+	messages  core.Messages
+	navigator core.NavigatorManager
+	room      core.RoomManager
+	server    *http.Server
+	plugin    core.PluginManager
+}
+
 func NewNetworking(
 	ctx context.Context, host string, port int, messages core.Messages,
 	navigator core.NavigatorManager,
 	room core.RoomManager,
+	plugin core.PluginManager,
 ) core.Networking {
 	return &networking{
 		ctx:       ctx,
@@ -69,5 +72,6 @@ func NewNetworking(
 		messages:  messages,
 		navigator: navigator,
 		room:      room,
+		plugin:    plugin,
 	}
 }

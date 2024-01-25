@@ -2,14 +2,9 @@ package extensions
 
 import (
 	"encoding/json"
-	"os"
-)
 
-type Plugin interface {
-	OnStart()
-	OnLoad()
-	OnUnload()
-}
+	"github.com/Izzxt/vic/core"
+)
 
 type pluginConfig struct {
 	Name        string `json:"name"`
@@ -38,20 +33,8 @@ func (p *pluginConfig) GetVersion() string {
 	return p.Version
 }
 
-type PluginConfig interface {
-	GetName() string
-	GetVersion() string
-	GetAuthor() string
-	GetDescription() string
-	LoadConfigFile(string) (PluginConfig, error)
-}
-
 // LoadConfigFile implements PluginConfig.
-func (p *pluginConfig) LoadConfigFile(path string) (PluginConfig, error) {
-	bytes, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
+func (p *pluginConfig) LoadConfigFile(bytes []byte) (core.PluginConfig, error) {
 
 	if err := json.Unmarshal(bytes, p); err != nil {
 		return nil, err
@@ -74,6 +57,6 @@ func (p *pluginConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func NewPluginConfig() PluginConfig {
+func NewPluginConfig() core.PluginConfig {
 	return &pluginConfig{}
 }
