@@ -24,12 +24,16 @@ type Habbo interface {
 	RoomUnit() HabboRoomUnit
 	SetRoomUnit(HabboRoomUnit)
 	HabboStats() HabboStats
+	Talk(string, int32)
+	Whisper(Habbo, string, int32)
+	Shout(string, int32)
 }
 
 type HabboStats interface {
 	Context() context.Context
 	Load(int32) HabboStats
 	UpdateBubbleChat(int32)
+	GetBubbleChat() int32
 }
 
 type NoobnessLevel int

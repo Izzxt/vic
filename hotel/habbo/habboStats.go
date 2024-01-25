@@ -15,6 +15,11 @@ type habboStats struct {
 	users_stats.UsersStat
 }
 
+// GetBubbleChat implements core.HabboStats.
+func (h *habboStats) GetBubbleChat() int32 {
+	return h.BubbleChatID.Int32
+}
+
 func (h *habboStats) Context() context.Context {
 	return h.ctx
 }
@@ -46,6 +51,8 @@ func (h *habboStats) UpdateBubbleChat(styleId int32) {
 	}); err != nil {
 		fmt.Printf("Error updating bubble chat: %v\n", err)
 	}
+
+	h.BubbleChatID = sql.NullInt32{Int32: styleId, Valid: true}
 }
 
 func NewHabboStats(ctx context.Context, user users_stats.UsersStat) core.HabboStats {

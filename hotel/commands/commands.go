@@ -23,20 +23,18 @@ func (c *Commands) Exists(name string) bool {
 
 // HandleCommand handles a command.
 func (c *Commands) HandleCommand(client core.HabboClient, message string) {
-	if strings.HasPrefix(message, ":") {
-		message = message[1:]
-		split := strings.Split(message, " ")
-		commandName := split[0]
-		args := split[1:]
-		if !c.Exists(commandName) {
-			client.Send(&room_chat.RoomUnitChatWhisperComposer{
-				RoomUnit: client.GetHabbo().RoomUnit(), Message: "Command not found.",
-				Gesture: 0, Bubble: 0, MessageLength: 0})
-			return
-		}
-		command := c.Get(commandName)
-		command.Execute(client, args)
+	message = message[1:]
+	split := strings.Split(message, " ")
+	commandName := split[0]
+	args := split[1:]
+	if !c.Exists(commandName) {
+		client.Send(&room_chat.RoomUnitChatWhisperComposer{
+			RoomUnit: client.GetHabbo().RoomUnit(), Message: "Command not found.",
+			Gesture: 0, Bubble: 0, MessageLength: 0})
+		return
 	}
+	command := c.Get(commandName)
+	command.Execute(client, args)
 }
 
 func (c *Commands) Register(name string, command core.Command) {

@@ -2,12 +2,10 @@ package chat_message
 
 import (
 	"strings"
-	"unicode/utf8"
 
 	"github.com/Izzxt/vic/core"
 	"github.com/Izzxt/vic/hotel/commands"
 	"github.com/Izzxt/vic/packets/incoming"
-	room_chat "github.com/Izzxt/vic/packets/outgoing/room/units/chats"
 )
 
 type chatMessage struct {
@@ -22,8 +20,10 @@ type chatMessage struct {
 }
 
 func (c *chatMessage) parseCommand() {
-	c.isCommand = true
-	c.command.HandleCommand(c.client, c.message)
+	if strings.HasPrefix(c.message, ":") {
+		c.isCommand = true
+		c.command.HandleCommand(c.client, c.message)
+	}
 }
 
 func (c *chatMessage) parseWhisperMessage() {
@@ -34,38 +34,37 @@ func (c *chatMessage) parseWhisperMessage() {
 
 func (c *chatMessage) SendMessage() {
 	// TODO: check if muted
-	// TODO: add bubble functionallity
 	// TODO: add gesture functionallity
 	if c.isWhisper {
 		c.parseWhisperMessage()
-		c.client.Send(&room_chat.RoomUnitChatWhisperComposer{
-			RoomUnit: c.client.GetHabbo().RoomUnit(), Message: c.message, Gesture: 0,
-			Bubble: 0, MessageLength: int32(utf8.RuneCountInString(c.message))})
 
-		if c.target != nil {
-			c.target.Client().Send(&room_chat.RoomUnitChatWhisperComposer{
-				RoomUnit: c.client.GetHabbo().RoomUnit(), Message: c.message, Gesture: 0,
-				Bubble: 0, MessageLength: int32(utf8.RuneCountInString(c.message))})
-		}
-	} else if c.isShout {
-		c.client.SendToRoom(c.client.GetHabbo().Room(), &room_chat.RoomUnitChatShoutComposer{
-			RoomUnit: c.client.GetHabbo().RoomUnit(), Message: c.message, Gesture: 0,
-			Bubble: 0, MessageLength: int32(utf8.RuneCountInString(c.message))})
-	} else {
-		c.parseCommand()
-		if c.isCommand {
+		if c.target == nil || c.client.GetHabbo() == c.target {
+			c.client.GetHabbo().Whisper(c.client.GetHabbo(), c.message, 0)
 			return
 		}
 
-		c.client.SendToRoom(c.client.GetHabbo().Room(), &room_chat.RoomUnitChatComposer{
-			RoomUnit: c.client.GetHabbo().RoomUnit(), Message: c.message, Gesture: 0,
-			Bubble: 0, MessageLength: int32(utf8.RuneCountInString(c.message))})
+		c.client.GetHabbo().Whisper(c.client.GetHabbo(), c.message, 0)
+		c.target.Client().GetHabbo().Whisper(c.client.GetHabbo(), c.message, 0)
+	} else if c.isShout {
+		c.client.GetHabbo().Shout(c.message, 0)
+	} else {
+		c.parseCommand()
+		if !c.isCommand {
+			c.client.GetHabbo().Talk(c.message, c.styleId)
+		}
 	}
 }
 
 func NewChatMessage(client core.HabboClient, header int16, message string, styleId int32) core.ChatMessage {
 	command := commands.NewCommandManager()
 	command.RegisterCommands()
+
+	if styleId != 1 {
+		client.GetHabbo().HabboStats().UpdateBubbleChat(styleId)
+	} else {
+		styleId = client.GetHabbo().HabboStats().GetBubbleChat()
+	}
+
 	chatMsg := chatMessage{client: client, isWhisper: false, isShout: false, message: message,
 		styleId: styleId, isCommand: false, command: command,
 	}

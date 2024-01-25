@@ -15,5 +15,4 @@ func (*RoomUnitChatEvent) Execute(client core.HabboClient, packet core.IncomingP
 	chatMessage := chat_message.NewChatMessage(client, packet.GetHeader(), message, styleId)
 	chatMessage.SendMessage()
 
-	client.GetHabbo().HabboStats().UpdateBubbleChat(styleId)
 }

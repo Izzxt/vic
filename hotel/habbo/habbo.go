@@ -3,10 +3,12 @@ package habbo
 import (
 	"context"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/Izzxt/vic/core"
 	users "github.com/Izzxt/vic/database/users/querier"
 	users_stats "github.com/Izzxt/vic/database/users/stats/querier"
+	room_chat "github.com/Izzxt/vic/packets/outgoing/room/units/chats"
 )
 
 type habbo struct {
@@ -66,6 +68,27 @@ func (h *habbo) SetRoomUnit(roomUnit core.HabboRoomUnit) {
 	h.mu.Lock()
 	h.roomUnit = roomUnit
 	h.mu.Unlock()
+}
+
+// Whisper implements core.IHabbo.
+func (h *habbo) Whisper(to core.Habbo, message string, gesture int32) {
+	h.client.Send(&room_chat.RoomUnitChatWhisperComposer{
+		RoomUnit: to.RoomUnit(), Message: message, Gesture: gesture,
+		Bubble: h.HabboStats().GetBubbleChat(), MessageLength: int32(utf8.RuneCountInString(message))})
+}
+
+// Shout implements core.IHabbo.
+func (h *habbo) Shout(message string, gesture int32) {
+	h.client.SendToRoom(h.Room(), &room_chat.RoomUnitChatShoutComposer{
+		RoomUnit: h.RoomUnit(), Message: message, Gesture: gesture,
+		Bubble: h.HabboStats().GetBubbleChat(), MessageLength: int32(utf8.RuneCountInString(message))})
+}
+
+// Talk implements core.IHabbo.
+func (h *habbo) Talk(message string, gesture int32) {
+	h.client.SendToRoom(h.Room(), &room_chat.RoomUnitChatComposer{
+		RoomUnit: h.RoomUnit(), Message: message, Gesture: gesture,
+		Bubble: h.HabboStats().GetBubbleChat(), MessageLength: int32(utf8.RuneCountInString(message))})
 }
 
 func NewHabbo(ctx context.Context, users users.User, client core.HabboClient) core.Habbo {
