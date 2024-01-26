@@ -8,3 +8,6 @@ dump:
 
 gen:
 	sqlc generate -f ./database/database.json
+
+packet-gen:
+	go run packets/gen.go

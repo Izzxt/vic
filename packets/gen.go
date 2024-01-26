@@ -66,17 +66,14 @@ func checkFileExists(filename string) bool {
 	return true
 }
 
-var headerTmpt = `const {{.Name}} = {{.Header}}`
+var headerTmpt = `const {{.Name}} = {{.Header}}` + "\n"
 
-var tmpt = `{{if eq .Type "incoming"}}
-package {{.PackageName}}
-{{else if eq .Type "outgoing"}}
-package {{.PackageName}}
-{{end}}
+var tmpt = `package {{.PackageName}}
+
 import (
-	"github.com/Izzxt/vic/core"{{if eq .Type "outgoing"}}
-	"github.com/Izzxt/vic/packets/outgoing"
-){{end}}
+	"github.com/Izzxt/vic/core"
+	{{if eq .Type "outgoing"}}"github.com/Izzxt/vic/packets/outgoing"{{end}}
+)
 
 type {{.Name}} struct {}
 {{if eq .Type "incoming"}}
