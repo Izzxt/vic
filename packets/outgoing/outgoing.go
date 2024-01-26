@@ -34,7 +34,6 @@ const RelativeMapComposer = 2753
 const HeightMapComposer = 1301
 const RoomRightsComposer = 780
 const RoomUserDataComposer = 3920
-const RoomUserStatusComposer = 1640
 const RoomOwnerComposer = 339
 const RoomCreatedComposer = 1304
 

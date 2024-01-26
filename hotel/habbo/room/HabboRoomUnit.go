@@ -210,6 +210,7 @@ func NewHabboRoomUnit(id int32, habbo core.Habbo, room core.Room, currentTile co
 	habboRoomUnit.habbo = habbo
 	habboRoomUnit.room = room
 	habboRoomUnit.currentTile = currentTile
+	habboRoomUnit.headRotation = bodyRotation
 	habboRoomUnit.bodyRotation = bodyRotation
 	habboRoomUnit.statMu = sync.RWMutex{}
 	habboRoomUnit.ptMu = sync.RWMutex{}
